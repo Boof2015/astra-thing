@@ -1,0 +1,23 @@
+header:
+  version: 18
+  includes:
+    - kas/example-kiosk.yml
+
+distro: astra-thing
+
+target:
+  - astra-thing-dev-image
+  - astra-thing-update-dev
+
+repos:
+  astra-thing:
+    path: astra
+    layers:
+      meta-astra-thing:
+
+local_conf_header:
+  astra-build-resources: |
+    BB_NUMBER_THREADS = "6"
+    PARALLEL_MAKE = "-j 6"
+    PARALLEL_MAKE:pn-chromium-ozone-wayland = "-j 4"
+    BB_DISKMON_DIRS = "STOPTASKS,${TMPDIR},10G,100K HALT,${TMPDIR},5G,50K"

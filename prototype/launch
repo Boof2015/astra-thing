@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+if [ -f /etc/astra-thing-release.json ]; then
+    unset PYTHONPATH
+    exec /usr/bin/python3 /usr/lib/superbird-kiosk/astra/app/client.py serve
+fi
+APP_ROOT=/opt/superbird-kiosk/astra
+export PYTHONPATH="$APP_ROOT/runtime/usr/lib/python3.14:$APP_ROOT/runtime/usr/lib/python3.14/lib-dynload"
+exec /usr/bin/python3 "$APP_ROOT/app/client.py" serve

@@ -1,0 +1,10 @@
+{
+  "yocto_superbird_url": "https://github.com/JoeyEamigh/yocto-superbird.git",
+  "yocto_superbird_commit": "5969a5f1c63dfc4ab2f52191db6d0ebbc22a672d",
+  "kas_version": "5.5",
+  "kas_container_image": "ghcr.io/siemens/kas/kas@sha256:4b210b0be3c887875973c4f4c35470b4ecf3edd2346c9de1bdd33feae5b86e94",
+  "flashthing_url": "https://github.com/JoeyEamigh/flashthing.git",
+  "flashthing_commit": "80146130826532482d703d8f351fb2aede0bf54a",
+  "image": "superbird-kiosk-dev-image",
+  "docker_volume": "astra-thing-yocto"
+}

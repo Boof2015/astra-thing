@@ -1,0 +1,19 @@
+[Unit]
+Description=Astra Thing USB maintenance
+After=superbird-usb-gadget.service systemd-networkd.service avahi-daemon.service
+Requires=superbird-usb-gadget.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /usr/lib/superbird-kiosk/astra/app/management.py
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

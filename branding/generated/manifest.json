@@ -1,0 +1,20 @@
+{
+  "renderer": "@resvg/resvg-js 2.6.2",
+  "sourceSha256": "dd58fb0c38a1510b97b16341d73974613a350239f2567c2ae04059df0f256686",
+  "landscape": {
+    "width": 800,
+    "height": 480,
+    "lockupWidth": 520,
+    "background": "#000000"
+  },
+  "boot": {
+    "width": 480,
+    "height": 800,
+    "rotation": "90 degrees clockwise",
+    "format": "RGB565 BMP"
+  },
+  "files": {
+    "logo.bmp": "71864f989ce9afc1ee33d3252ffb68c8808299cb5388f7366eec56dc125135ae",
+    "splash.png": "eb5d0a519fd2b19ce93ccc94a8d78dc4f99635478dd6945204607478cb4fb443"
+  }
+}

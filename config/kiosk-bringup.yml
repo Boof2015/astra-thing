@@ -1,0 +1,15 @@
+header:
+  version: 18
+  includes:
+    - kas/example-kiosk.yml
+
+# First hardware bring-up: only the upstream development image.
+target:
+  - superbird-kiosk-dev-image
+
+local_conf_header:
+  astra-build-resources: |
+    BB_NUMBER_THREADS = "6"
+    PARALLEL_MAKE = "-j 6"
+    PARALLEL_MAKE:pn-chromium-ozone-wayland = "-j 4"
+    BB_DISKMON_DIRS = "STOPTASKS,${TMPDIR},10G,100K HALT,${TMPDIR},5G,50K"

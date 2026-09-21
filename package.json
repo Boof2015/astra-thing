@@ -1,0 +1,30 @@
+{
+  "name": "astra-thing",
+  "version": "0.3.0",
+  "private": true,
+  "description": "Astra Thing firmware and device manager development commands",
+  "license": "GPL-3.0-only",
+  "author": "Boof2015",
+  "engines": {"node": ">=24"},
+  "scripts": {
+    "postinstall": "npm run setup",
+    "setup": "npm ci --prefix manager && npm ci --prefix tools/branding",
+    "dev": "npm run dev --prefix manager --",
+    "build": "npm run build --prefix manager",
+    "build:mac": "npm run build:mac --prefix manager",
+    "build:windows": "npm run build:windows --prefix manager",
+    "build:win": "npm run build:windows",
+    "build:linux": "npm run build:linux --prefix manager",
+    "build:worker": "npm run build:worker --prefix manager",
+    "build:branding": "node scripts/render-branding.mjs",
+    "build:firmware": "node scripts/run-python.cjs scripts/build-astra-image.py --release",
+    "build:firmware:dev": "node scripts/run-python.cjs scripts/build-astra-image.py",
+    "test": "npm run test:manager && npm run test:ui",
+    "test:manager": "npm test --prefix manager",
+    "test:ui": "node --test tests/queue-preview.test.cjs tests/search-preview.test.cjs",
+    "test:worker": "cargo test --locked --manifest-path manager/native/Cargo.toml",
+    "test:firmware": "node scripts/run-python.cjs -m unittest discover -s tests -p test_*.py",
+    "release:sign": "node manager/scripts/sign-release.cjs",
+    "release:sources": "node scripts/run-python.cjs scripts/package-sources.py"
+  }
+}

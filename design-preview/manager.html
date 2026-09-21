@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+  <title>Astra Thing Manager · Interactive concept</title>
+  <link rel="stylesheet" href="manager.css">
+  <script src="manager.js" defer></script>
+</head>
+<body>
+  <aside class="preview-tools" aria-label="Prototype controls">
+    <div><strong>INTERACTIVE CONCEPT</strong><span>Simulated devices · no USB access or files changed</span></div>
+    <label>View <select id="preview-scene"><option value="connect">First installation</option><option value="hold">Recovery guide</option><option value="manage">Device manager</option><option value="error">Interrupted install</option></select></label>
+    <label>Platform <select id="preview-platform"><option>macOS</option><option>Windows</option><option>Linux</option></select></label>
+  </aside>
+  <main class="manager" aria-label="Astra Thing Manager">
+    <header class="app-header">
+      <div class="app-brand"><img src="../branding/astra-full.svg" alt="Astra"><span>THING MANAGER</span></div>
+      <span class="connection" id="connection-status"><span class="dot"></span><span>Waiting for a device</span></span>
+    </header>
+    <nav class="journey" aria-label="Installation progress" id="journey"></nav>
+    <section class="stage" aria-labelledby="step-title">
+      <div class="visual-side"><div id="device-art"></div><div id="visual-caption" class="visual-caption"></div></div>
+      <div class="instruction-side" id="instruction"></div>
+    </section>
+    <footer class="app-footer"><div id="footer-left"></div><div id="footer-right"></div></footer>
+  </main>
+  <aside class="simulation" aria-label="Simulate hardware events">
+    <span>PREVIEW INPUT</span><p id="event-description"></p><button id="simulate-event" type="button"></button>
+    <button id="simulate-disconnect" type="button">Disconnect USB</button>
+  </aside>
+  <p class="preview-note">Recovery instructions advance on device detection. Use the preview input above to stand in for the physical hardware.</p>
+  <div class="sr-only" id="announcer" role="status" aria-live="polite"></div>
+  <dialog id="help-dialog" aria-labelledby="help-title"><button class="dialog-close quiet" data-action="close-help" aria-label="Close help">×</button><p class="eyebrow">A LITTLE HELP</p><h2 id="help-title">Let’s get connected.</h2><div id="help-copy"></div><button class="primary" data-action="close-help">Got it</button></dialog>
+</body>
+</html>

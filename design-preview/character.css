@@ -1,0 +1,102 @@
+/* A single visual proposal over the approved Study 02 type and target sizes.
+   Every change is scoped so the on-page comparison restores the baseline. */
+.character-controls {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+  margin-top:25px;
+}
+.character-controls button {
+  padding:10px 15px;
+  border:1px solid #434849;
+  border-radius:7px;
+  color:#acb3b1;
+  background:transparent;
+  font-size:12px;
+}
+.character-controls button[aria-pressed=true] {
+  background:#dcd8cd;
+  border-color:#dcd8cd;
+  color:#232b28;
+}
+.character-controls p {
+  margin:0 0 0 12px;
+  color:#a4aca8;
+  font-size:12px;
+  line-height:1.5;
+}
+.size-controls {margin-top:16px}
+.screen[data-character=panel] {
+  --panel:#ede8db;
+  --panel-ink:#222e29;
+  --control:var(--panel);
+  --control-ink:var(--panel-ink);
+  --highlight:var(--panel);
+  --base:#171b1a;
+}
+.screen[data-character=panel] .ambient {opacity:.13}
+.screen[data-character=panel] .main-art {
+  border-radius:13px;
+  box-shadow:none;
+}
+.screen[data-character=panel] .transport {
+  width:800px;
+  height:102px;
+  max-width:none;
+  margin:0 -25px;
+  padding:0 45px;
+  border-radius:20px 20px 0 0;
+  background:var(--panel);
+  color:var(--panel-ink);
+  box-shadow:inset 0 1px 0 #ffffff60;
+}
+.screen[data-character=panel] .transport .icon-button {
+  border-radius:17px;
+  color:var(--panel-ink)!important;
+}
+.screen[data-character=panel] .transport .icon-button:active {
+  background:#273c2f12;
+}
+.screen[data-character=panel] .transport .secondary-transport[aria-pressed=true] {
+  background:#273c2f1c;
+}
+.screen[data-character=panel] .transport .play-button {
+  border-radius:18px;
+  background:var(--panel-ink);
+  color:var(--panel)!important;
+  box-shadow:inset 0 1px 1px #ffffff18;
+}
+.screen[data-character=panel] .volume-overlay {
+  bottom:124px;
+  border-radius:18px;
+  background:var(--panel);
+  color:var(--panel-ink);
+}
+.screen[data-character=panel] .toast {
+  bottom:124px;
+  border-radius:18px;
+  background:var(--panel);
+  color:var(--panel-ink);
+}
+.screen[data-character=panel] .playlist {border-radius:13px}
+.screen[data-character=panel] .playlist img {border-radius:6px}
+.screen[data-character=panel] .playlist.selected {
+  background:var(--panel);
+  border-color:var(--panel);
+  color:var(--panel-ink);
+}
+.screen[data-character=panel] .mini-player {
+  width:800px;
+  height:72px;
+  margin:4px 0 0;
+  padding:8px 25px;
+  border:0;
+  border-radius:18px 18px 0 0;
+  background:var(--panel);
+  color:var(--panel-ink);
+}
+.screen[data-character=panel] .mini-player .icon {color:var(--panel-ink)}
+@media(max-width:700px) {
+  .character-controls p {flex-basis:100%;margin:3px 0 0;font-size:11px}
+}

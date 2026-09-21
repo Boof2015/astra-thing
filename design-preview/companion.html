@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Astra Thing · Search preview</title>
+  <link rel="stylesheet" href="study.css">
+  <link rel="stylesheet" href="readability.css">
+  <link rel="stylesheet" href="character.css">
+  <link rel="stylesheet" href="language.css">
+  <link rel="stylesheet" href="companion.css">
+  <link rel="stylesheet" href="queue.css">
+  <link rel="stylesheet" href="search.css">
+  <script src="queue-model.js" defer></script>
+  <script src="search-model.js" defer></script>
+  <script src="companion-system.js" defer></script>
+  <script src="queue-ui.js" defer></script>
+  <script src="search-ui.js" defer></script>
+  <script src="companion-client.js" defer></script>
+</head>
+<body>
+  <main class="workbench">
+    <header class="study-header">
+      <div><p class="eyebrow">ASTRA THING / SEARCH</p><h1>That song in your head.</h1></div>
+      <p class="study-note">Find it. Play it. Keep listening.<br><a href="language.html">Interface study</a></p>
+    </header>
+    <div class="size-controls">
+      <button id="compact-size" aria-pressed="true">Compact check</button>
+      <button id="large-size" aria-pressed="false">Enlarged view</button>
+      <label for="preview-scale">Preview size <output id="scale-label">52%</output></label>
+      <input id="preview-scale" type="range" min="35" max="100" value="52" aria-label="Preview size">
+    </div>
+    <p id="direction-description" class="direction-description">Match the preview’s screen width to the physical display beside your monitor. This size is adjustable, not a calibrated measurement.</p>
+    <div class="rig-stage" id="rig-stage">
+      <section class="device" aria-label="Car Thing screen and simulated hardware controls">
+        <div class="preset-row">
+          <button class="preset active" data-view="playing" aria-pressed="true"><span>1 · Playing</span></button>
+          <button class="preset" data-view="queue" aria-pressed="false"><span>2 · Queue</span></button>
+          <button class="preset" data-view="playlists" aria-pressed="false"><span>3 · Playlists</span></button>
+          <button class="preset" data-view="search" aria-pressed="false"><span>4 · Search</span></button>
+        </div>
+        <button id="device-settings" class="device-settings" aria-label="Open settings" aria-pressed="false"><span>Settings</span></button>
+        <div class="screen" id="screen" data-theme="readability" data-character="panel" data-language="unified">
+          <div class="ambient" aria-hidden="true"></div>
+          <header class="screen-header">
+            <div class="brand"><img src="assets/astra-wordmark.svg" alt="Astra"><span id="view-label">PLAYING</span></div>
+            <div class="context-label"><span class="playing-dot"></span><span id="context-label">After hours</span></div>
+            <button id="screen-navigation" class="text-action" aria-label="Open playlists"><span id="navigation-label">Playlists</span><span data-icon="grid"></span></button>
+            <span id="queue-position" class="queue-position" hidden></span>
+          </header>
+          <section id="playing-view" aria-label="Now playing">
+            <div class="player-main">
+              <img class="main-art" id="main-art" src="assets/tidal.svg" alt="Soft Landing sample album artwork">
+              <div class="track-copy">
+                <h2 id="track-title">Tidal Memory</h2>
+                <p class="artist" id="track-artist">Low Season</p>
+                <p class="album" id="track-album" hidden>Soft Landing</p>
+              </div>
+            </div>
+            <footer class="player-footer">
+              <div class="progress-module" id="progress-module">
+                <label class="sr-only" for="seek">Playback position</label>
+                <input id="seek" class="seek" type="range" min="0" max="244" value="87" step="1">
+                <div class="time-row"><span id="elapsed">1:27</span><span id="duration">4:04</span></div>
+              </div>
+              <div class="transport" aria-label="Playback controls">
+                <button class="icon-button secondary-transport" id="shuffle" aria-label="Enable shuffle" aria-pressed="false" data-icon="shuffle"></button>
+                <button class="icon-button" id="previous" aria-label="Previous track" data-icon="previous"></button>
+                <button class="play-button" id="play" aria-label="Pause" data-icon="pause"></button>
+                <button class="icon-button" id="next" aria-label="Next track" data-icon="next"></button>
+                <button class="icon-button secondary-transport" id="repeat" aria-label="Repeat this track" aria-pressed="false" data-icon="repeat"></button>
+              </div>
+              <div class="footer-line" hidden><button class="up-next" id="open-playlists"><span class="footer-label">FROM</span><span id="playlist-context">After hours</span><span data-icon="chevron"></span></button><span class="volume-status"><span data-icon="volume"></span><span id="volume-small">64</span></span></div>
+            </footer>
+          </section>
+          <section id="playlists-view" aria-label="Playlists" hidden>
+            <div class="collection-heading"><h2>Your playlists</h2><div class="shelf-controls"><button id="shelf-previous" aria-label="Previous playlists" data-icon="back"></button><span id="shelf-page">1 / 2</span><button id="shelf-next" aria-label="Next playlists" data-icon="chevron"></button></div></div>
+            <div class="playlist-grid" id="playlist-grid" aria-label="Choose a playlist"></div>
+            <button class="mini-player" id="mini-player" aria-label="Return to now playing"><img id="mini-art" src="assets/tidal.svg" alt=""><span><strong id="mini-title">Tidal Memory</strong><small id="mini-artist">Low Season</small></span><span class="mini-playing" data-icon="equalizer"></span><span class="mini-hint">Playing</span><span data-icon="chevron"></span></button>
+          </section>
+          <section id="queue-view" aria-label="Upcoming queue" hidden>
+            <div id="queue-list" class="queue-list" role="list" aria-label="Upcoming tracks"></div>
+            <div id="queue-empty" class="queue-empty" hidden><h2>Nothing up next.</h2><p>Pick a playlist to keep the music going.</p><button id="queue-browse">Playlists <span data-icon="chevron"></span></button></div>
+            <button id="queue-now-playing" class="mini-player" aria-label="Return to now playing"><img id="queue-now-art" src="assets/tidal.svg" alt=""><span><strong id="queue-now-title">Tidal Memory</strong></span><span id="queue-now-icon" data-icon="pause"></span><span data-icon="chevron"></span></button>
+            <div id="queue-move-toolbar" class="queue-move-toolbar" hidden>
+              <button id="queue-move-up" class="queue-move-step" aria-label="Move track up"><span data-icon="chevron"></span></button>
+              <button id="queue-move-down" class="queue-move-step" aria-label="Move track down"><span data-icon="chevron"></span></button>
+              <span class="queue-toolbar-space"></span><button id="queue-move-cancel">Cancel</button><button id="queue-move-confirm" class="queue-place">Place here</button>
+            </div>
+          </section>
+          <section id="queue-actions-view" role="dialog" aria-labelledby="queue-action-title" hidden>
+            <div class="queue-track-summary"><img id="queue-action-art" src="assets/sundial.svg" alt=""><div><h2 id="queue-action-title">Somewhere, Slowly</h2><p id="queue-action-artist">Sunday Service</p></div></div>
+            <div class="system-panel queue-action-list">
+              <button class="menu-row" id="queue-play-next"><span id="queue-play-next-label">Play next</span><span data-icon="chevron"></span></button>
+              <button class="menu-row" id="queue-start-move"><span>Move</span><span data-icon="chevron"></span></button>
+              <button class="menu-row" id="queue-remove"><span>Remove</span><span data-icon="chevron"></span></button>
+            </div>
+          </section>
+          <p id="queue-announcement" class="sr-only" role="status"></p>
+          <section id="search-view" aria-label="Enter a song or artist" hidden>
+            <div class="search-entry">
+              <label for="search-input" class="sr-only">Song or artist</label>
+              <input id="search-input" type="text" inputmode="none" autocomplete="off" spellcheck="false" maxlength="64" placeholder="Song or artist" enterkeyhint="search">
+              <button id="search-clear" aria-label="Clear search" data-icon="close" hidden></button>
+            </div>
+            <div id="search-keyboard" class="search-keyboard" aria-label="Touch keyboard"></div>
+          </section>
+          <section id="search-results-view" aria-label="Song search results" hidden>
+            <div id="search-results" class="queue-list" role="list" aria-label="Matching songs"></div>
+            <div id="search-empty" class="queue-empty" hidden><h2>No songs found.</h2><p>Try a different song or artist.</p><button id="search-try-again">Edit search <span data-icon="keyboard"></span></button></div>
+            <button id="search-now-playing" class="mini-player" aria-label="Return to now playing"><img id="search-now-art" src="assets/tidal.svg" alt=""><span><strong id="search-now-title">Tidal Memory</strong></span><span id="search-now-icon" data-icon="pause"></span><span data-icon="chevron"></span></button>
+          </section>
+          <section id="search-actions-view" role="dialog" aria-labelledby="search-action-title" hidden>
+            <div class="queue-track-summary"><img id="search-action-art" src="assets/tidal.svg" alt=""><div><h2 id="search-action-title">Tidal Memory</h2><p id="search-action-artist">Low Season</p></div></div>
+            <div class="system-panel queue-action-list">
+              <button class="menu-row" id="search-play-now"><span>Play now</span><span data-icon="chevron"></span></button>
+              <button class="menu-row" id="search-play-next"><span>Play next</span><span data-icon="chevron"></span></button>
+              <button class="menu-row" id="search-add-queue"><span>Add to queue</span><span data-icon="chevron"></span></button>
+            </div>
+          </section>
+          <p id="search-announcement" class="sr-only" role="status"></p>
+          <section id="settings-view" aria-label="Appearance settings" hidden>
+            <div class="settings-panel">
+              <div class="setting-row">
+                <div class="setting-copy"><h2 id="surfaces-label">Control surfaces</h2><p>Player, keys &amp; readouts</p></div>
+                <div class="setting-choices" role="group" aria-labelledby="surfaces-label">
+                  <button data-surface="light" aria-pressed="true">Light</button>
+                  <button data-surface="dark" aria-pressed="false">Dark</button>
+                </div>
+              </div>
+              <div class="setting-row">
+                <div class="setting-copy"><h2 id="album-color-label">Album color</h2><p>Follow the cover’s palette</p></div>
+                <div class="setting-choices" role="group" aria-labelledby="album-color-label">
+                  <button data-album-color="true" aria-pressed="true">On</button>
+                  <button data-album-color="false" aria-pressed="false">Off</button>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="system-view" aria-label="Device" hidden></section>
+          <div id="volume-overlay" class="volume-overlay" role="status" hidden><span data-icon="volume"></span><div><span class="overlay-label">VOLUME</span><strong id="volume-large">64</strong></div><div class="volume-track"><div id="volume-fill"></div></div></div>
+          <div id="toast" class="toast" role="status" hidden></div>
+        </div>
+        <div class="hardware">
+          <button id="dial" class="dial" aria-label="Press dial: play or pause; choose a selected playlist"><span class="dial-marker"></span><span class="dial-face"></span></button>
+          <div class="dial-steps"><button id="dial-left" aria-label="Turn dial left">−</button><button id="dial-right" aria-label="Turn dial right">+</button></div>
+          <button class="back-button" id="back" aria-label="Back" data-icon="back"></button>
+          <span class="hardware-caption">ASTRA THING</span>
+        </div>
+      </section>
+    </div>
+    <footer class="study-footer">
+      <p><strong>Try it:</strong> Press 4 for Search. Tap the keyboard or type on this Mac. Browse results with the dial, press for actions. Esc goes back.</p>
+      <p>Local design preview. Music, search, pairing, and device actions are simulated.</p>
+    </footer>
+    <div class="scenario-controls" aria-label="Preview connection scenarios">
+      <span>Preview</span><button data-scenario="setup">First setup</button><button data-scenario="connected">Connected</button><button data-scenario="reconnect">Connection lost</button><button data-scenario="boot">Boot</button><button data-scenario="dim">Idle dim</button>
+    </div>
+    <div class="scenario-controls" aria-label="Queue preview scenarios"><span>Queue preview</span><button id="queue-demo-refill">Refill</button><button id="queue-demo-advance">Finish track</button><button id="queue-demo-empty">Empty queue</button></div>
+    <p class="search-fixture-note">Sample songs only. Try “tidal”, “low”, or “motion”; “a” finds a longer list.</p>
+    <div class="simulation-panel" id="pairing-simulation" hidden>
+      <p class="eyebrow">SIMULATED ASTRA PROMPT · ON YOUR COMPUTER</p>
+      <h2>Connect Astra Thing?</h2>
+      <p>Allow this device to browse your music and control playback.</p>
+      <div class="approval-match"><strong id="desktop-code">482 169</strong><span>Check that this matches your Thing.</span></div>
+      <div class="simulation-actions"><button data-pair-result="approved">Approve</button><button data-pair-result="declined">Decline</button><button data-pair-result="expired">Expire request</button></div>
+    </div>
+    <div class="simulation-panel compact-simulation" id="discovery-simulation" hidden>
+      <p>Preview a discovery result</p><button data-discovery="one">Find one computer</button><button data-discovery="many">Find two computers</button><button data-discovery="none">Find none</button>
+    </div>
+    <div class="simulation-panel compact-simulation" id="reconnect-simulation" hidden>
+      <p>Preview the computer coming back</p><button id="simulate-reconnect">Restore connection</button>
+    </div>
+    <div class="sample-controls"><span>Sample</span><button data-sample="0" aria-pressed="true">Cool</button><button data-sample="1" aria-pressed="false">Warm</button><button data-sample="2" aria-pressed="false">Graphic</button><button data-sample="5" aria-pressed="false">Long title</button></div>
+  </main>
+</body>
+</html>

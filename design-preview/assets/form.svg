@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+ <defs><pattern id="lines" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M0 0v16" stroke="#212f26" stroke-width="5"/></pattern></defs><path fill="#c8d879" d="M0 0h600v600H0z"/>
+ <circle cx="301" cy="280" r="201" fill="#253c31"/><circle cx="375" cy="247" r="142" fill="#c8d879"/><path d="M31 66h537v425H31z" fill="url(#lines)" opacity=".72"/>
+ <text x="33" y="544" font-family="Arial,sans-serif" font-weight="700" font-size="45" letter-spacing="-2" fill="#21372d">FORM / FUNCTION</text><text x="35" y="575" font-family="Arial,sans-serif" font-size="12" letter-spacing="5" fill="#21372d">PARALLEL LINES</text>
+</svg>

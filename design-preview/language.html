@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Astra Thing · Interface study</title>
+  <link rel="stylesheet" href="study.css">
+  <link rel="stylesheet" href="readability.css">
+  <link rel="stylesheet" href="character.css">
+  <link rel="stylesheet" href="language.css">
+  <script src="language-client.js" defer></script>
+</head>
+<body>
+  <main class="workbench">
+    <header class="study-header">
+      <div><p class="eyebrow">ASTRA THING / STUDY 04</p><h1>One family of controls.</h1></div>
+      <p class="study-note">Header, progress, and interaction states<br><a href="character.html">Previous study</a></p>
+    </header>
+    <div class="character-controls" aria-label="Compare the visual treatment">
+      <button data-language-choice="previous" aria-pressed="false">Previous panel</button>
+      <button data-language-choice="unified" aria-pressed="true">Unified controls</button>
+      <p id="character-description">Shared keys, an integrated timeline, and clear active states.</p>
+    </div>
+    <div class="size-controls">
+      <button id="compact-size" aria-pressed="true">Compact check</button>
+      <button id="large-size" aria-pressed="false">Enlarged view</button>
+      <label for="preview-scale">Preview size <output id="scale-label">52%</output></label>
+      <input id="preview-scale" type="range" min="35" max="100" value="52" aria-label="Preview size">
+    </div>
+    <p id="direction-description" class="direction-description">Match the preview’s screen width to the physical display beside your monitor. This size is adjustable, not a calibrated measurement.</p>
+    <div class="rig-stage" id="rig-stage">
+      <section class="device" aria-label="Car Thing screen and simulated hardware controls">
+        <div class="preset-row">
+          <button class="preset active" data-view="playing" aria-pressed="true"><span>1 · Playing</span></button>
+          <button class="preset" disabled><span>2 · Queue</span></button>
+          <button class="preset" data-view="playlists" aria-pressed="false"><span>3 · Playlists</span></button>
+          <button class="preset" disabled><span>4 · Search</span></button>
+        </div>
+        <button id="device-settings" class="device-settings" aria-label="Open settings" aria-pressed="false"><span>Settings</span></button>
+        <div class="screen" id="screen" data-theme="readability" data-character="panel" data-language="unified">
+          <div class="ambient" aria-hidden="true"></div>
+          <header class="screen-header">
+            <div class="brand"><img src="assets/astra-wordmark.svg" alt="Astra"><span id="view-label">PLAYING</span></div>
+            <div class="context-label"><span class="playing-dot"></span><span id="context-label">After hours</span></div>
+            <button id="screen-navigation" class="text-action" aria-label="Open playlists"><span id="navigation-label">Playlists</span><span data-icon="grid"></span></button>
+          </header>
+          <section id="playing-view" aria-label="Now playing">
+            <div class="player-main">
+              <img class="main-art" id="main-art" src="assets/tidal.svg" alt="Soft Landing sample album artwork">
+              <div class="track-copy">
+                <h2 id="track-title">Tidal Memory</h2>
+                <p class="artist" id="track-artist">Low Season</p>
+                <p class="album" id="track-album" hidden>Soft Landing</p>
+              </div>
+            </div>
+            <footer class="player-footer">
+              <div class="progress-module" id="progress-module">
+                <label class="sr-only" for="seek">Playback position</label>
+                <input id="seek" class="seek" type="range" min="0" max="244" value="87" step="1">
+                <div class="time-row"><span id="elapsed">1:27</span><span id="duration">4:04</span></div>
+              </div>
+              <div class="transport" aria-label="Playback controls">
+                <button class="icon-button secondary-transport" id="shuffle" aria-label="Enable shuffle" aria-pressed="false" data-icon="shuffle"></button>
+                <button class="icon-button" id="previous" aria-label="Previous track" data-icon="previous"></button>
+                <button class="play-button" id="play" aria-label="Pause" data-icon="pause"></button>
+                <button class="icon-button" id="next" aria-label="Next track" data-icon="next"></button>
+                <button class="icon-button secondary-transport" id="repeat" aria-label="Repeat this track" aria-pressed="false" data-icon="repeat"></button>
+              </div>
+              <div class="footer-line" hidden><button class="up-next" id="open-playlists"><span class="footer-label">FROM</span><span id="playlist-context">After hours</span><span data-icon="chevron"></span></button><span class="volume-status"><span data-icon="volume"></span><span id="volume-small">64</span></span></div>
+            </footer>
+          </section>
+          <section id="playlists-view" aria-label="Playlists" hidden>
+            <div class="collection-heading"><h2>Your playlists</h2><div class="shelf-controls"><button id="shelf-previous" aria-label="Previous playlists" data-icon="back"></button><span id="shelf-page">1 / 2</span><button id="shelf-next" aria-label="Next playlists" data-icon="chevron"></button></div></div>
+            <div class="playlist-grid" id="playlist-grid" aria-label="Choose a playlist"></div>
+            <button class="mini-player" id="mini-player" aria-label="Return to now playing"><img id="mini-art" src="assets/tidal.svg" alt=""><span><strong id="mini-title">Tidal Memory</strong><small id="mini-artist">Low Season</small></span><span class="mini-playing" data-icon="equalizer"></span><span class="mini-hint">Playing</span><span data-icon="chevron"></span></button>
+          </section>
+          <section id="settings-view" aria-label="Appearance settings" hidden>
+            <div class="settings-panel">
+              <div class="setting-row">
+                <div class="setting-copy"><h2 id="surfaces-label">Control surfaces</h2><p>Player, keys &amp; readouts</p></div>
+                <div class="setting-choices" role="group" aria-labelledby="surfaces-label">
+                  <button data-surface="light" aria-pressed="true">Light</button>
+                  <button data-surface="dark" aria-pressed="false">Dark</button>
+                </div>
+              </div>
+              <div class="setting-row">
+                <div class="setting-copy"><h2 id="album-color-label">Album color</h2><p>Follow the cover’s palette</p></div>
+                <div class="setting-choices" role="group" aria-labelledby="album-color-label">
+                  <button data-album-color="true" aria-pressed="true">On</button>
+                  <button data-album-color="false" aria-pressed="false">Off</button>
+                </div>
+              </div>
+            </div>
+          </section>
+          <div id="volume-overlay" class="volume-overlay" role="status" hidden><span data-icon="volume"></span><div><span class="overlay-label">VOLUME</span><strong id="volume-large">64</strong></div><div class="volume-track"><div id="volume-fill"></div></div></div>
+          <div id="toast" class="toast" role="status" hidden></div>
+        </div>
+        <div class="hardware">
+          <button id="dial" class="dial" aria-label="Press dial: play or pause; choose a selected playlist"><span class="dial-marker"></span><span class="dial-face"></span></button>
+          <div class="dial-steps"><button id="dial-left" aria-label="Turn dial left">−</button><button id="dial-right" aria-label="Turn dial right">+</button></div>
+          <button class="back-button" id="back" aria-label="Back" data-icon="back"></button>
+          <span class="hardware-caption">ASTRA THING</span>
+        </div>
+      </section>
+    </div>
+    <footer class="study-footer">
+      <p><strong>Try it:</strong> Open Settings above the dial (or press M). Browse with ← → and Enter. Esc goes back.</p>
+      <p>Simulated music. Check the compact view from your normal viewing distance.</p>
+    </footer>
+    <div class="sample-controls"><span>Sample</span><button data-sample="0" aria-pressed="true">Cool</button><button data-sample="1" aria-pressed="false">Warm</button><button data-sample="2" aria-pressed="false">Graphic</button><button data-sample="5" aria-pressed="false">Long title</button></div>
+  </main>
+</body>
+</html>

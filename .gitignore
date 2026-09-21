@@ -1,0 +1,62 @@
+# Private tooling, device state, backups, and local scratch work.
+.local/
+backups/
+/work/
+.codex/
+.agents/
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+*.jks
+*.mobileprovision
+
+# Dependencies and caches. Commit package-lock.json and Cargo.lock.
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.cache/
+.coverage
+coverage/
+htmlcov/
+*.log
+
+# Local editor and operating-system files.
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Generated binaries and release output. Keep manager/build/ icons,
+# branding/generated/ firmware inputs, and vendored FlashThing boot resources.
+target/
+manager/dist/
+manager/resources/worker/
+release-output/
+/dist/
+/build/
+*.app/
+*.dmg
+*.exe
+*.AppImage
+*.deb
+*.blockmap
+*.swu
+*.wic
+*.wic.*
+*.squashfs
+*.ext4
+/*.zip
+/*.tar.gz

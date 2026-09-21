@@ -1,0 +1,129 @@
+/* The approved interface language, extended to the life of the device. */
+.screen[data-system=true] .screen-header {height:72px}
+.screen[data-system=true] .screen-header .brand {display:flex}
+.screen[data-system=true] .screen-header .brand>span {font-size:32px;font-weight:600;letter-spacing:-.6px;color:var(--ink)}
+.screen[data-system=true] .context-label {display:none}
+.screen[data-system=true] #screen-navigation {flex-direction:row-reverse}
+#system-view {height:408px}
+.screen[data-page=boot] .screen-header {display:none}
+.screen[data-page=boot] #system-view {height:480px}
+.system-panel {height:396px;margin-top:12px;padding:10px 25px 16px;border-radius:20px 20px 0 0;background:var(--panel);color:var(--panel-ink)}
+.system-menu {display:flex;flex-direction:column}
+.screen .menu-row {width:100%;height:74px;flex-shrink:0;border:0;border-radius:10px;background:transparent;display:flex;align-items:center;gap:18px;padding:0 13px;text-align:left;color:var(--panel-ink);font-size:32px;font-weight:550;letter-spacing:-.5px}
+.menu-row+.menu-row {border-top:1px solid var(--panel-line)}
+.menu-row>span:first-child {flex:1;min-width:0}
+.menu-row small {font-size:22px;font-weight:450;letter-spacing:0;opacity:.8}
+.menu-row>.icon {width:28px;height:28px;flex-shrink:0}
+.screen .system-panel button:focus-visible,
+.screen .system-panel .dial-selected,
+.screen .system-actions button:focus-visible,
+.screen .system-actions .dial-selected,
+.screen .setting-choices .dial-selected {outline:3px solid var(--panel-ink);outline-offset:-3px}
+.screen .dial-selected {outline:3px solid var(--header-ink);outline-offset:3px}
+/* Menu navigation uses the same inverse fill as active transport keys.
+   Keep focus separate from saved values on the segmented choices and sliders. */
+.screen[data-language=unified] .menu-row:is(.dial-selected,:focus-visible,:active,.is-pressed) {
+  background:var(--key-dark);
+  color:var(--panel);
+  border-color:transparent;
+  border-radius:13px;
+  outline:none;
+}
+.screen[data-language=unified] .menu-row:is(.dial-selected,:focus-visible,:active,.is-pressed)+.menu-row {border-top-color:transparent}
+.screen[data-language=unified] .menu-row.danger:is(.dial-selected,:focus-visible,:active,.is-pressed) {
+  background:var(--danger);
+  color:var(--panel);
+}
+/* The shelf always sits on the dark canvas, so its selection stays light
+   even when the lower control surfaces use the dark appearance. */
+.screen[data-language=unified] .playlist:is(.selected,:focus-visible,:active,.is-pressed) {
+  background:var(--selection-edge);
+  color:var(--key-quiet);
+  border-color:var(--selection-edge);
+  outline:none;
+}
+.system-copy {height:280px;padding:26px 30px 20px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:15px}
+.system-copy h2 {font-size:52px;font-weight:620;line-height:1.06;letter-spacing:-1.8px;margin:0;max-width:735px}
+.system-copy p {font-size:28px;line-height:1.35;letter-spacing:-.25px;color:var(--muted);margin:0;max-width:700px}
+.system-copy .status-label {font-size:23px;font-weight:500;letter-spacing:0;display:flex;align-items:center;gap:12px}
+.signal-mark {display:inline-block;width:5px;height:22px;background:var(--header-ink);border-radius:2px;flex-shrink:0}
+.signal-mark.waiting {animation:signal-wait 1.2s ease-in-out infinite alternate}
+.system-actions {height:128px;border-radius:20px 20px 0 0;background:var(--panel);color:var(--panel-ink);padding:25px 30px;display:flex;align-items:center;gap:18px}
+.screen .system-key {height:76px;min-width:190px;padding:0 26px;border:1px solid var(--panel-line);border-radius:15px;background:transparent;color:var(--panel-ink);font-size:28px;font-weight:550;display:flex;align-items:center;justify-content:center;gap:14px;white-space:nowrap}
+.screen .system-key.primary {background:var(--key-dark);color:var(--panel)}
+.screen .system-key:active {background:var(--panel-pressed)}
+.screen .system-key.primary:active {background:var(--key-down)}
+.system-key .icon {height:28px;width:28px}
+.system-actions>.system-key:only-child {width:100%}
+.system-actions>.system-key {flex:1}
+.screen .system-key.danger {color:var(--danger);border-color:var(--danger)}
+.screen {--danger:#ff9e9e}
+.screen[data-surface=light] {--danger:#963f45}
+.action-note {font-size:24px;line-height:1.3;flex:1;margin:0;opacity:.8}
+.system-actions .cancel-key {flex:0 0 190px}
+.connection-copy {height:206px;padding-top:21px;gap:12px}
+.connection-copy h2 {font-size:44px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:710px}
+.connection-menu {height:202px;margin:0;padding:19px 25px 25px}
+.connection-menu .menu-row {height:79px}
+.connection-offline-copy {height:166px}
+.connection-offline-menu {height:242px;padding:7px 25px}
+.connection-offline-menu .menu-row {height:76px}
+.screen .menu-row.danger {color:var(--danger)}
+.host-menu {margin-top:0;height:204px}
+.host-menu .menu-row {height:86px}
+.host-menu .menu-row small {display:block;font-size:22px;margin-top:5px}
+.host-copy {height:204px;justify-content:center}
+.host-copy h2 {font-size:47px}
+.pairing-copy {height:280px;padding:10px 30px 12px;gap:9px;justify-content:center}
+.pairing-copy h2 {font-size:43px;letter-spacing:-1.2px}
+.pairing-copy .pair-code {font-size:88px;font-weight:600;line-height:1.15;letter-spacing:11px;color:var(--ink);font-variant-numeric:tabular-nums;margin:0}
+.pairing-copy p {font-size:26px}
+.pairing-copy .pair-host {font-size:23px;opacity:.85;margin-bottom:2px}
+.system-actions .approval-status {font-size:25px;font-weight:550;display:flex;align-items:center;gap:14px;flex:1}
+.system-actions .signal-mark {background:var(--panel-ink)}
+.info-copy {height:244px;justify-content:center;gap:18px}
+.info-copy h2 {font-size:52px}
+.info-copy p {font-size:26px}
+.info-version {font-variant-numeric:tabular-nums}
+.credit-panel {height:164px;border-radius:20px 20px 0 0;background:var(--panel);color:var(--panel-ink);display:flex;align-items:center;justify-content:center;gap:10px;flex-direction:column}
+.credit-panel p {margin:0;font-size:28px;display:flex;align-items:center;gap:14px;line-height:1.4}
+.credit-panel strong {font-size:32px;font-weight:600;letter-spacing:-.6px}
+.pixel-heart {width:30px;height:24px;image-rendering:pixelated;filter:drop-shadow(0 0 8px #fb71852a)}
+.screen[data-surface=light] .pixel-heart {filter:none}
+.device-menu {height:396px;margin:12px 0 0;padding:12px 25px}
+.device-menu .menu-row {height:88px}
+.device-note {font-size:25px;line-height:1.4;color:var(--panel-ink);opacity:.8;padding:28px 13px 0;margin:0;max-width:720px}
+.display-panel {padding:20px 30px 16px}
+.brightness-heading {display:flex;align-items:baseline;justify-content:space-between;margin:0 0 10px;font-size:30px;font-weight:600;letter-spacing:-.5px}
+.brightness-heading output {font-size:32px;font-variant-numeric:tabular-nums}
+.display-range {display:block;width:100%;height:62px;appearance:none;background:transparent;margin:0;--progress:80%;cursor:pointer;touch-action:none}
+.display-range::-webkit-slider-runnable-track {height:7px;border-radius:4px;background:linear-gradient(to right,var(--panel-ink) var(--progress),var(--panel-line) var(--progress))}
+.display-range::-moz-range-track {height:7px;border-radius:4px;background:var(--panel-line)}
+.display-range::-moz-range-progress {height:7px;background:var(--panel-ink)}
+.display-range::-webkit-slider-thumb {appearance:none;height:32px;width:24px;border-radius:6px;margin-top:-12.5px;background:var(--panel-ink)}
+.display-range::-moz-range-thumb {height:32px;width:24px;border:0;border-radius:6px;background:var(--panel-ink)}
+.display-panel .setting-row {height:130px;border-top:1px solid var(--panel-line);margin-top:9px;gap:12px}
+.display-panel .setting-choices {gap:6px}
+.display-panel .setting-choices button {width:96px;font-size:26px}
+.display-hint {font-size:23px;line-height:1.3;opacity:.8;margin:17px 0 0}
+.screen .display-range:focus-visible,.screen .display-range.dial-selected {outline:3px solid var(--panel-ink);outline-offset:1px;border-radius:8px}
+.screen .display-range.is-editing {outline-style:dashed}
+.boot-screen {height:480px;display:flex;align-items:center;justify-content:center;position:relative}
+.boot-screen img {width:300px;height:auto}
+.boot-screen p {position:absolute;bottom:47px;left:0;right:0;text-align:center;font-size:25px;color:var(--muted);margin:0}
+.screen[data-dimmed=true]::after {content:'Turn or tap to wake';position:absolute;inset:0;display:grid;place-items:center;background:#000b;color:#ede8db;font-size:32px;z-index:10}
+.scenario-controls {display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:22px;font-size:12px;color:#a4aaa7}
+.scenario-controls>span {margin-right:6px}
+.scenario-controls button,.simulation-panel button {background:transparent;border:1px solid #505653;color:#dddcd3;padding:8px 12px;border-radius:7px;font-size:12px}
+.simulation-panel {margin-top:20px;max-width:540px;padding:22px;border:1px solid #424846;border-radius:14px;background:#202423;color:#e7e5dc}
+.simulation-panel h2 {font-size:24px;letter-spacing:-.5px;margin:5px 0 9px;font-weight:550}
+.simulation-panel p:not(.eyebrow) {font-size:14px;line-height:1.5;margin:0 0 16px;color:#bfc4bf}
+.approval-match {display:flex;gap:25px;align-items:center;margin:20px 0}
+.approval-match strong {font-size:30px;letter-spacing:3px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.approval-match span {font-size:12px;line-height:1.5;color:#b8beb8}
+.simulation-actions {display:flex;gap:8px;flex-wrap:wrap}
+.simulation-actions button:first-child {background:#ede8db;color:#252c29;border-color:#ede8db}
+.compact-simulation {padding:16px 20px}
+.compact-simulation button {margin:0 5px 5px 0}
+@keyframes signal-wait {from{opacity:.3}to{opacity:1}}
+@media(prefers-reduced-motion:reduce) {.signal-mark.waiting {animation:none;opacity:.65}}

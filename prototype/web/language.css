@@ -1,0 +1,245 @@
+/* Study 04. The selector gates the new language so comparison is in place. */
+.screen[data-language=unified] {
+  --key-radius:13px;
+  --key-dark:#28392f;
+  --key-quiet:#29322d;
+  --key-edge:#bbc9b42b;
+  --key-down:#15251b;
+  --panel-line:#263e2e2e;
+  --feedback-time:90ms;
+  --travel-time:160ms;
+}
+
+/* Give header keys 10 px above and below without moving the transport panel. */
+.screen[data-language=unified] .screen-header {height:72px}
+.screen[data-language=unified] .player-main {height:252px}
+.screen[data-language=unified] .main-art {width:236px;height:236px}
+.screen[data-language=unified] .collection-heading {top:10px;right:25px;height:52px}
+.screen[data-language=unified] .playlist-grid {height:332px}
+.screen[data-language=unified] .playlist {gap:12px}
+.screen[data-language=unified] .playlist img {height:208px}
+
+/* Header controls share the transport key geometry, at their existing scale. */
+.screen[data-language=unified] .screen-header .context-label {
+  font-weight:550;
+  gap:12px;
+  max-width:535px;
+}
+.screen[data-language=unified] .playing-dot {
+  width:5px;
+  height:20px;
+  border-radius:2px;
+  background:var(--header-ink);
+}
+.screen[data-language=unified] .text-action {
+  padding:0 14px;
+  height:52px;
+  border:1px solid var(--key-edge);
+  border-radius:var(--key-radius);
+  background:var(--key-quiet);
+  font-weight:550;
+  color:var(--header-ink)!important;
+}
+.screen[data-language=unified] .text-action .icon {stroke-width:2}
+.screen[data-language=unified] .shelf-controls {
+  gap:0;
+  height:50px;
+  border:1px solid var(--key-edge);
+  border-radius:var(--key-radius);
+  background:var(--key-quiet);
+  color:var(--header-ink);
+}
+.screen[data-language=unified] .shelf-controls button {
+  width:50px;
+  height:48px;
+  border-radius:11px;
+}
+.screen[data-language=unified] #shelf-page {
+  min-width:57px;
+  text-align:center;
+  font-weight:550;
+}
+
+/* The timeline and transport are parts of one stationary control surface. */
+.screen[data-language=unified] .player-footer {
+  background:var(--panel);
+  color:var(--panel-ink);
+  border-radius:20px 20px 0 0;
+}
+.screen[data-language=unified] .progress-module {
+  position:relative;
+  height:54px;
+  padding:0 79px;
+}
+.screen[data-language=unified] .seek {
+  height:54px;
+  margin:0;
+  --highlight:var(--key-dark);
+  --line:var(--panel-line);
+  position:relative;
+  z-index:1;
+  touch-action:none;
+}
+.screen[data-language=unified] .seek::-webkit-slider-runnable-track {
+  height:7px;
+  border-radius:4px;
+}
+.screen[data-language=unified] .seek::-moz-range-track {
+  height:7px;
+  border-radius:4px;
+}
+.screen[data-language=unified] .seek::-webkit-slider-thumb {
+  width:20px;
+  height:26px;
+  border-radius:6px;
+  margin-top:-9.5px;
+  background:var(--key-dark);
+  box-shadow:inset 0 1px 0 #ffffff24;
+}
+.screen[data-language=unified] .seek::-moz-range-thumb {
+  width:20px;
+  height:26px;
+  border-radius:6px;
+  background:var(--key-dark);
+  box-shadow:inset 0 1px 0 #ffffff24;
+}
+.screen[data-language=unified] .time-row {
+  position:absolute;
+  inset:0;
+  height:54px;
+  align-items:center;
+  color:var(--panel-ink);
+  pointer-events:none;
+}
+.screen[data-language=unified] #elapsed {font-weight:650}
+.screen[data-language=unified] .progress-module.is-scrubbing #elapsed {
+  font-size:27px;
+  letter-spacing:-.8px;
+}
+.screen[data-language=unified] .progress-module.is-scrubbing .seek::-webkit-slider-thumb {
+  background:var(--key-down);
+  box-shadow:inset 0 2px 3px #0005;
+}
+.screen[data-language=unified] .transport {
+  border-radius:0;
+  box-shadow:none;
+}
+.screen[data-language=unified] .transport .play-button {
+  background:var(--key-dark);
+}
+
+/* Active keys invert the control surface, in either appearance. */
+.screen[data-language=unified] .transport .secondary-transport[aria-pressed=true] {
+  background:var(--key-dark);
+  color:var(--panel)!important;
+  box-shadow:inset 0 1px 1px #0002;
+}
+.screen[data-language=unified] button {
+  transition:background-color var(--feedback-time) ease,
+             color var(--feedback-time) ease,
+             transform var(--feedback-time) ease,
+             box-shadow var(--feedback-time) ease;
+}
+.screen[data-language=unified] button:active:not(:disabled),
+.screen[data-language=unified] button.is-pressed {
+  transform:translateY(2px);
+  box-shadow:inset 0 2px 3px #0002;
+}
+.screen[data-language=unified] .text-action:active,
+.screen[data-language=unified] .shelf-controls button:active:not(:disabled) {
+  color:var(--panel-ink)!important;
+  background:var(--panel);
+}
+.screen[data-language=unified] .transport .play-button:active,
+.screen[data-language=unified] .transport .play-button.is-pressed {
+  background:var(--key-down);
+  box-shadow:inset 0 3px 4px #0005;
+}
+.screen[data-language=unified] button:focus-visible,
+.device:has(.screen[data-language=unified]) .dial:focus-visible,
+.device:has(.screen[data-language=unified]) .back-button:focus-visible {
+  outline:3px solid #eee8da;
+  outline-offset:3px;
+}
+.screen[data-language=unified] .transport button:focus-visible,
+.screen[data-language=unified] .mini-player:focus-visible,
+.screen[data-language=unified] .seek:focus-visible {
+  outline:3px solid var(--key-dark);
+  outline-offset:2px;
+}
+.screen[data-language=unified] .seek:focus-visible {border-radius:8px}
+.screen[data-language=unified] .playlist:focus-visible {outline-offset:0}
+.screen[data-language=unified] .playlist.selected {
+  background:var(--panel);
+  border-color:var(--selection-edge);
+  color:var(--panel-ink);
+}
+.screen[data-language=unified] .playlist:active,
+.screen[data-language=unified] .mini-player:active,
+.screen[data-language=unified] .transport .icon-button:active {background:var(--panel-pressed)}
+.screen[data-language=unified] .transport .secondary-transport[aria-pressed=true]:active {background:var(--key-down)}
+.screen[data-album-color=off] .ambient {opacity:0}
+.screen[data-language=unified] .volume-overlay,
+.screen[data-language=unified] .toast {bottom:170px}
+.screen[data-language=unified] .volume-track {height:7px;border-radius:4px}
+.screen[data-language=unified] .volume-track>div {background:var(--key-dark)}
+
+/* Appearance lives behind the hardware settings key. */
+.device-settings {
+  position:absolute;right:71px;top:-15px;width:125px;height:21px;
+  border:1px solid #444746;border-radius:7px 7px 0 0;
+  background:linear-gradient(#393c3b,#1b1d1c);color:#a8b0ad;
+}
+.device-settings span {position:absolute;bottom:27px;left:0;right:0;font-size:13px}
+.device-settings[aria-pressed=true] {border-top-color:#e9e4d8;color:#e9e4d8}
+.device-settings:focus-visible {outline:3px solid #eee8da;outline-offset:4px}
+.screen:has(#settings-view:not([hidden])) .screen-header {height:72px}
+.screen:has(#settings-view:not([hidden])) .context-label {display:none}
+.screen:has(#settings-view:not([hidden])) .brand {display:flex}
+.screen:has(#settings-view:not([hidden])) .brand>span {
+  font-size:32px;font-weight:600;letter-spacing:-.6px;color:var(--ink);
+}
+.screen:has(#settings-view:not([hidden])) #screen-navigation {flex-direction:row-reverse}
+#settings-view {height:408px;padding-top:12px}
+.settings-panel {
+  height:396px;border-radius:20px 20px 0 0;padding:14px 30px 30px;
+  background:var(--panel);color:var(--panel-ink);
+}
+.setting-row {height:174px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.setting-row+.setting-row {border-top:1px solid var(--panel-line)}
+.setting-copy h2 {font-size:30px;line-height:1.2;font-weight:600;letter-spacing:-.7px;margin:0 0 10px}
+.setting-copy p {font-size:21px;line-height:1.3;margin:0;opacity:.8}
+.setting-choices {display:flex;gap:8px;flex-shrink:0}
+.setting-choices button {
+  width:133px;height:72px;border:1px solid var(--panel-line);border-radius:13px;
+  background:transparent;color:var(--panel-ink);font-size:28px;font-weight:550;
+}
+.setting-choices button[aria-pressed=true] {background:var(--key-dark);color:var(--panel)}
+.screen .setting-choices button:focus-visible,
+.screen .setting-choices button.dial-selected {outline:3px solid var(--panel-ink);outline-offset:4px}
+.setting-choices button:active {background:var(--panel-pressed)}
+.setting-choices button[aria-pressed=true]:active {background:var(--key-down)}
+
+/* Content moves a short distance; the control surface stays anchored. */
+.screen[data-language=unified] #playing-view:not([hidden]) .player-main {
+  animation:player-arrives var(--travel-time) ease-out;
+}
+.screen[data-language=unified] #playlists-view:not([hidden]) .playlist-grid {
+  animation:shelf-arrives var(--travel-time) ease-out;
+}
+.screen[data-language=unified] .main-art.track-arrives,
+.screen[data-language=unified] .track-copy.track-arrives {
+  animation:track-arrives 140ms ease-out;
+}
+.screen[data-language=unified] .volume-overlay:not([hidden]),
+.screen[data-language=unified] .toast:not([hidden]) {
+  animation:readout-arrives 110ms ease-out;
+}
+@keyframes player-arrives {from{opacity:.55;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+@keyframes shelf-arrives {from{opacity:.55;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+@keyframes track-arrives {from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes readout-arrives {from{opacity:.6;translate:0 5px}to{opacity:1;translate:0 0}}
+@media(prefers-reduced-motion:reduce) {
+  .screen[data-language=unified] button:active:not(:disabled),
+  .screen[data-language=unified] button.is-pressed {transform:none}
+}

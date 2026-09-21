@@ -1,0 +1,7 @@
+[Unit]
+Description=Retry an Astra Thing boot that did not become healthy
+ConditionPathExists=!/run/astra-thing-healthy
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/systemctl reboot

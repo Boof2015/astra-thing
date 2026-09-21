@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+slot=''
+for arg in $(cat /proc/cmdline); do
+    case "$arg" in superbird.slot=a) slot=a;; superbird.slot=b) slot=b;; esac
+done
+case "$slot" in a|b) ;; *) exit 1;; esac
+[ "$(readlink -f "$(findmnt -n -o SOURCE /)")" = "$(readlink -f /dev/disk/by-partlabel/root_$slot)" ]
+[ "$(fw_printenv -n slot_active)" = "$slot" ]
+fw_setenv "slot_${slot}_tries" 3
+touch /run/astra-thing-healthy

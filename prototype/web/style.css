@@ -1,0 +1,34 @@
+/* Device shell; layout/type/controls come from the approved preview CSS. */
+html,body {margin:0;width:100%;height:100%;overflow:hidden;background:#14191b;overscroll-behavior:none}
+body {padding:0;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+#screen {position:relative;inset:auto;width:800px;height:480px;border-radius:0;margin:0;isolation:isolate;overflow:hidden;box-shadow:none;font-family:Arial,'Liberation Sans',sans-serif}
+#screen .screen-header {display:flex;align-items:center;justify-content:space-between}
+#screen button:disabled {opacity:.35;cursor:default}
+.art-placeholder {width:236px;height:236px;flex-shrink:0;display:grid;place-items:center;border-radius:13px;background:var(--key-quiet);color:var(--header-ink);font-size:80px}
+.main-art {flex-shrink:0}
+#screen .track-copy h2 {overflow-wrap:anywhere}
+#screen .volume-overlay>span {display:grid;place-items:center}
+#screen .volume-overlay>span>.icon {width:29px;height:29px}
+#screen .toast {max-width:740px}
+#screen .seek:disabled {opacity:.45;cursor:default}
+#screen[data-view=appearance] .screen-header .brand {display:flex}
+#screen[data-view=appearance] .screen-header .context-label {display:none}
+#screen[data-view=appearance] .screen-header .brand>span {font-size:32px;font-weight:600;color:var(--ink)}
+#screen[data-view=appearance] #screen-navigation {flex-direction:row-reverse}
+#screen .repeat-mark {font-size:14px;font-weight:700;position:absolute;bottom:9px;left:0;width:100%;text-align:center}
+#repeat {position:relative}
+#screen .transport :is(#previous,#next):is(:active,.is-pressed) {background:var(--key-dark);color:var(--panel)!important;box-shadow:inset 0 2px 3px #0002}
+@media(prefers-reduced-motion:reduce) {*,*::before,*::after {animation:none!important;transition:none!important}}
+/* Live data keeps the approved screen geometry and inverse selections. */
+#screen .browse-message {grid-column:1 / -1;margin:0;padding:35px 5px;font-size:34px;line-height:1.3;color:var(--ink)}
+#screen .playlist strong {display:block;font-size:30px;line-height:1.15;font-weight:600;letter-spacing:-.7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;text-align:left}
+#screen .queue-spacer {position:relative;width:100%;min-height:1px}
+#screen .virtual-row {position:absolute;left:0;right:0;margin:0}
+#screen .host-menu {overflow-y:auto}
+#screen .brand img {flex-shrink:0}
+#screen[data-dimmed=true]::after {background:#0004;font-size:26px}
+#screen[data-page=boot] .screen-header {display:none}
+#screen[data-page=boot] #system-view {height:480px}
+#screen[data-page=boot] {background:#000}
+#screen[data-page=boot] .boot-screen img {width:520px;height:auto}
+#screen .queue-track.is-moving {opacity:1}

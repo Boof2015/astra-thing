@@ -1,0 +1,25 @@
+{
+  "repository": "https://github.com/JoeyEamigh/flashthing",
+  "revision": "80146130826532482d703d8f351fb2aede0bf54a",
+  "changes": [
+    "Cargo manifest workspace tracing dependency resolved and README path adjusted for vendoring.",
+    "Require an exact success acknowledgement for vendor bulk commands; reject error messages containing that word."
+  ],
+  "sourceHashes": {
+    "src/native.rs": "d338f95b37588bb6e1939bcebdb57d37da12f6e5984ff5ed8a77f2843c527327",
+    "src/aml.rs": "f392be3cac6a94d94ff8d6ca46dea09d8027783e7aed78c0c0ee46bb07c06361",
+    "src/config.rs": "199a5aee282c5e2cc60b51fe3887ec5a8b4173a85871a61b19bca72465c4a4a4",
+    "src/lib.rs": "791ab12f868552952c53ad45e437c80f0c5f5a3b3e9b0c8f7e20262c7d025086",
+    "src/time.rs": "984180cd81a8f194876db85843ed610b45e976ef68e5ad1e1eb0d548ccf3e82e",
+    "src/web.rs": "1e0e5349f961c6acfcf98d360cae9ddbf4fbf441e78daa717dc9e5805cd43917",
+    "src/partitions.rs": "ba30b0816de4942934cff5d454387659a7c1388f21f3cbcd8b558b0730f7b610",
+    "src/usb.rs": "736441a975f0cbe027d5ae6e406d62c129bd99e954b214747ad7035a9b8aaa12",
+    "src/boot_image.rs": "ff24335641aded87683f9b45ecdeb4dbb33a406be62ef2c8471d3942d6bf22b6",
+    "src/flash.rs": "7a69db8fb4b6edd4f821bae68a20e6334baca7b4168e282bb14d3d9d38c6ac64",
+    "src/payload.rs": "552f8efdab91b7e1ce8f98f7f50fc8924b0d086aa9afe96903f72ad686539ffb",
+    "src/setup.rs": "901f3c99a454fcdc4ac04a6660f2f116cb4071579a160f1daa98038e8c8ade6e",
+    "src/fastboot/client.rs": "1edcc93e8dec1c2edcbe0ad047e1a694baadad78f0070f221caab3f22efede07",
+    "src/fastboot/mod.rs": "673baa2d1889a901f9d409bd17c5b354467e7720ce03e97eb39df1a607b6b9cd",
+    "src/fastboot/flash.rs": "c70d69cb4478c4627041bed9796e6f4daadc018c1af504323647e673cf3230b9"
+  }
+}

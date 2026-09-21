@@ -1,0 +1,10 @@
+{
+  "version": "0.3.0",
+  "channel": "preview",
+  "modelId": "astra-thing",
+  "minimumManager": "0.3.0",
+  "astraRequirements": [
+    "hardware-v1",
+    "companion-api-v2-playlists"
+  ]
+}

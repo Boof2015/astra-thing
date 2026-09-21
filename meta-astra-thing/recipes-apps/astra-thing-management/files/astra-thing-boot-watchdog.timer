@@ -1,0 +1,9 @@
+[Unit]
+Description=Wait for Astra Thing display and input startup
+
+[Timer]
+OnBootSec=180
+Unit=astra-thing-boot-watchdog.service
+
+[Install]
+WantedBy=timers.target

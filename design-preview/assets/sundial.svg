@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+ <defs><linearGradient id="warm" x2="1" y2="1"><stop stop-color="#dbb791"/><stop offset="1" stop-color="#b66c43"/></linearGradient></defs>
+ <path fill="url(#warm)" d="M0 0h600v600H0z"/><path d="M82 532V264a218 218 0 0 1 436 0v268z" fill="#e6cba3"/><path d="M155 532V272a145 145 0 0 1 290 0v260z" fill="#754331"/><path d="M215 532V278a85 85 0 0 1 170 0v254z" fill="#282d2e"/>
+ <path d="M0 460 445 243v289L0 600z" fill="#bf7751" opacity=".63"/><path d="M0 532h600v68H0z" fill="#cd986e"/>
+ <text x="30" y="52" fill="#422d25" font-family="Arial,sans-serif" font-size="15" letter-spacing="4">SUNDAY SERVICE</text><text x="300" y="584" fill="#4b3228" text-anchor="middle" font-family="Georgia,serif" font-size="44" letter-spacing="6">SUNDIAL</text>
+</svg>
