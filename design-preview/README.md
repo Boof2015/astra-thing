@@ -12,9 +12,17 @@ presets 1 and 4 while the instructions say to keep holding them. A simulated USB
 recovery event advances the screen to “You can let go now”; a black screen alone
 does not advance it.
 
-The front illustration keeps the preset positions visible. A rear-port detail
-shows the USB-C socket centered on the back and facing the device's left side,
-with horizontal insertion/removal arrows, following the owner's hardware correction.
+The front illustration keeps the preset positions visible. A small close-up of
+the back below it, traced from a photo of the device and mirrored as seen when
+turned around, shows the USB-C port recessed in the side wall of the raised
+center plate. The
+cable lies flat along the back and slides in from the device's left side,
+following the owner's hardware correction. The drawing is shared with the real
+manager (`../manager/renderer/device-art.js`) and stays on screen between steps:
+the view eases toward the port or the screen, hands-on steps loop a short
+demonstration (unplug; hold presets 1 and 4, then plug in; plug in normally),
+transfers show a soft light moving along the cable in the direction of the data,
+and pairing shows the code on the Thing. Reduced-motion settings show still poses.
 
 Controls outside the application frame simulate plugging/unplugging, recovery
 detection, and successful firmware startup. The View selector jumps to the

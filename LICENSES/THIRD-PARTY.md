@@ -7,6 +7,7 @@ Astra Thing's original client and manager code is GPL-3.0-only. That license doe
 - **libusb**, LGPL-2.1-or-later, statically built by `libusb1-sys` for the manager worker. Publish the worker’s corresponding source and build instructions, including the pinned Cargo dependency sources, so users can rebuild it with a modified library.
 - **Electron**, MIT, and **Chromium** and its dependencies, various licenses. Preserve Electron’s `LICENSE` and `LICENSES.chromium.html` in packaged applications.
 - **bonjour-service**, MIT, with dependencies as recorded in `manager/package-lock.json`.
+- **Inter** and **JetBrains Mono**, SIL Open Font License 1.1. Latin subsets from Fontsource 5.2.8 are bundled in `manager/renderer/fonts/`. Their license texts are in `Inter-OFL.txt` and `JetBrainsMono-OFL.txt`.
 - **yocto-superbird** and its pinned OpenEmbedded/Yocto layers supply the Linux kernel, boot chain, Chromium kiosk, SWUpdate and system packages. The release build enables license manifests and SPDX output. Publish matching source/build material and required notices alongside firmware; the root project license alone does not describe the whole image.
 
 Before public distribution, review the generated dependency/license manifests, include all required notices and source materials, and verify the redistribution terms attached to binary firmware resources. This development checkout has not yet been published as a binary release.

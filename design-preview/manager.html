@@ -3,9 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; base-uri 'none'; form-action 'none'">
   <title>Astra Thing Manager · Interactive concept</title>
   <link rel="stylesheet" href="manager.css">
+  <script src="../manager/renderer/device-art.js" defer></script>
+  <script src="../manager/renderer/motion.js" defer></script>
   <script src="manager.js" defer></script>
 </head>
 <body>
@@ -16,7 +18,7 @@
   </aside>
   <main class="manager" aria-label="Astra Thing Manager">
     <header class="app-header">
-      <div class="app-brand"><img src="../branding/astra-full.svg" alt="Astra"><span>THING MANAGER</span></div>
+      <div class="app-brand"><img src="../manager/renderer/astra-wordmark.svg" alt="Astra"><span>THING MANAGER</span></div>
       <span class="connection" id="connection-status"><span class="dot"></span><span>Waiting for a device</span></span>
     </header>
     <nav class="journey" aria-label="Installation progress" id="journey"></nav>
@@ -32,6 +34,6 @@
   </aside>
   <p class="preview-note">Recovery instructions advance on device detection. Use the preview input above to stand in for the physical hardware.</p>
   <div class="sr-only" id="announcer" role="status" aria-live="polite"></div>
-  <dialog id="help-dialog" aria-labelledby="help-title"><button class="dialog-close quiet" data-action="close-help" aria-label="Close help">×</button><p class="eyebrow">A LITTLE HELP</p><h2 id="help-title">Let’s get connected.</h2><div id="help-copy"></div><button class="primary" data-action="close-help">Got it</button></dialog>
+  <dialog id="help-dialog" aria-labelledby="help-title"><button class="dialog-close quiet" data-action="close-help" aria-label="Close help">×</button><p class="eyebrow">HELP</p><h2 id="help-title">Connection troubleshooting</h2><div id="help-copy"></div><button class="primary" data-action="close-help">Got it</button></dialog>
 </body>
 </html>

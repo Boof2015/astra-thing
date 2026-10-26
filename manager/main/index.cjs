@@ -30,7 +30,7 @@ else app.whenReady().then(async () => {
     diagnostics: async () => {const result = await dialog.showSaveDialog(window, {defaultPath: 'astra-thing-diagnostics.json'}); return result.canceled ? null : result.filePath;},
     restart: async () => (await dialog.showMessageBox(window, {type: 'question', message: 'Restart your Thing?', detail: 'Your pairing and settings will be kept.', buttons: ['Cancel', 'Restart'], defaultId: 0, cancelId: 0})).response === 1
   }});
-  window = new BrowserWindow({width: 1160, height: 840, minWidth: 700, minHeight: 620, backgroundColor: '#0e171b', title: 'Astra Thing Manager', autoHideMenuBar: true, webPreferences: {preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, sandbox: true, nodeIntegration: false, webSecurity: true}});
+  window = new BrowserWindow({width: 1160, height: 840, minWidth: 700, minHeight: 620, backgroundColor: '#0f0f0f', title: 'Astra Thing Manager', autoHideMenuBar: true, webPreferences: {preload: path.join(__dirname, 'preload.cjs'), contextIsolation: true, sandbox: true, nodeIntegration: false, webSecurity: true}});
   const renderer = path.join(root, 'renderer/index.html'), expected = pathToFileURL(renderer).href;
   window.webContents.setWindowOpenHandler(() => ({action: 'deny'}));
   window.webContents.on('will-navigate', event => event.preventDefault());

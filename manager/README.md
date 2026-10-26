@@ -19,6 +19,8 @@ npm ci
 npm run dev
 ```
 
+`npm run preview` opens the same interface with sample data for every screen and no device, worker or network access. Jump between screens from the Screens menu, or step with Cmd/Ctrl+] and Cmd/Ctrl+[. Buttons move to the screen that would normally follow, and the Platform menu switches platform-specific help.
+
 `npm run dev` builds the worker incrementally before launch. The worker bundles libusb. It accepts a bounded JSON request and emits JSON progress; USB targets use their bus and physical port path.
 
 ```sh

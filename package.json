@@ -10,6 +10,7 @@
     "postinstall": "npm run setup",
     "setup": "npm ci --prefix manager && npm ci --prefix tools/branding",
     "dev": "npm run dev --prefix manager --",
+    "preview": "npm run preview --prefix manager --",
     "build": "npm run build --prefix manager",
     "build:mac": "npm run build:mac --prefix manager",
     "build:windows": "npm run build:windows --prefix manager",
