@@ -26,6 +26,10 @@
     "test:worker": "cargo test --locked --manifest-path manager/native/Cargo.toml",
     "test:firmware": "node scripts/run-python.cjs -m unittest discover -s tests -p test_*.py",
     "release:sign": "node manager/scripts/sign-release.cjs",
+    "release:prepare": "node scripts/release.cjs prepare",
+    "release:draft": "node scripts/release.cjs draft",
+    "release:verify": "node scripts/release.cjs verify",
+    "release:check": "node scripts/check-public-release.cjs",
     "release:sources": "node scripts/run-python.cjs scripts/package-sources.py"
   }
 }

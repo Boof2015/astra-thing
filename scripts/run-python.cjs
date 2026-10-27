@@ -10,7 +10,8 @@ function main() {
   if (!args.length) throw Error('A Python script or module is required.');
   const isFirmware = args[0].replaceAll('\\', '/').endsWith('scripts/build-astra-image.py');
   if (isFirmware && process.platform === 'win32') throw Error('Build firmware inside WSL2/Linux with Docker and the pinned BSP, or on macOS. The Windows manager builds natively with npm run build:windows. See docs/image-build.md.');
-  const candidates = process.platform === 'win32' ? [['py', '-3'], ['python'], ['python3']] : [['python3'], ['python']];
+  const candidates = process.platform === 'win32' ? [['py', '-3'], ['python'], ['python3']] :
+    [[path.resolve(__dirname, '../.local/build-venv/bin/python')], ['python3'], ['python3.14'], ['python3.13'], ['python3.12'], ['python3.11'], ['python']];
   for (const [command, ...prefix] of candidates) {
     const probe = spawnSync(command, [...prefix, '-c', 'import sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)'], {stdio: 'ignore'});
     if (probe.error || probe.status !== 0) continue;

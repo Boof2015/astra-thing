@@ -8,14 +8,22 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const require=createRequire(path.join(root,'tools/branding/package.json'));
 const {Resvg}=require('@resvg/resvg-js');
 const source=await readFile(path.join(root,'branding/astra-full.svg'),'utf8');
-if(!source.includes('viewBox="0 0 1625 182"')||/<(?:script|image|text)\b/i.test(source))throw new Error('Expected the supplied path-only Astra lockup');
-const width=520,height=width*182/1625;
-const lockup=source.slice(source.indexOf('<svg ')).replace('width="100%" height="100%"',`x="${(800-width)/2}" y="${(480-height)/2}" width="${width}" height="${height}"`);
+const opening=source.match(/<svg\b[^>]*>/);
+const viewBox=opening?.[0].match(/\bviewBox="([^"]+)"/)?.[1].trim().split(/[\s,]+/).map(Number);
+if(!viewBox||viewBox.length!==4||!viewBox.every(Number.isFinite)||viewBox[2]<=0||viewBox[3]<=0||/<(?:script|image|text|foreignObject)\b/i.test(source))throw new Error('Expected a path-only Astra lockup with a valid viewBox');
+// Preserve the supplied viewBox origin and aspect ratio. New lockups need not
+// share the old 1625×182 dimensions or use percentage width/height attributes.
+const width=Math.min(520,280*viewBox[2]/viewBox[3]),height=width*viewBox[3]/viewBox[2];
+const positioned=opening[0].replace(/\s(?:x|y|width|height)="[^"]*"/g,'')
+  .replace(/>$/,` x="${(800-width)/2}" y="${(480-height)/2}" width="${width}" height="${height}">`);
+const lockup=source.slice(opening.index).replace(opening[0],positioned);
 const frame=`<rect width="800" height="480" fill="#000"/>${lockup}`;
 const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="800" height="480">${frame}</svg>`;
-const portrait=`<svg xmlns="http://www.w3.org/2000/svg" width="480" height="800"><g transform="translate(480 0) rotate(90)">${frame}</g></svg>`;
 const options={font:{loadSystemFonts:false}};
-const splash=new Resvg(svg,options).render(),boot=new Resvg(portrait,options).render();
+const splash=new Resvg(svg,options).render();
+// Rotate the rendered splash, so antialiasing is identical across boot stages.
+const portrait=`<svg xmlns="http://www.w3.org/2000/svg" width="480" height="800"><image width="800" height="480" image-rendering="optimizeSpeed" transform="translate(480 0) rotate(90)" href="data:image/png;base64,${splash.asPng().toString('base64')}"/></svg>`;
+const boot=new Resvg(portrait,options).render();
 // RGB565, positive height/bottom-up rows, BI_BITFIELDS. This matches the
 // installed panel's 16-bit boot format and clockwise portrait orientation.
 const stride=(boot.width*2+3)&~3,offset=66,pixels=boot.pixels;
@@ -35,10 +43,11 @@ await writeFile(path.join(output,'logo.bmp'),bmp);
 await mkdir(path.join(root,'.local'),{recursive:true});
 await writeFile(path.join(root,'.local/astra-boot-portrait.png'),boot.asPng());
 await copyFile(path.join(root,'branding/astra-full.svg'),path.join(root,'prototype/web/assets/astra-full.svg'));
+await copyFile(path.join(root,'branding/astra-full.svg'),path.join(root,'manager/renderer/astra-wordmark.svg'));
 const sha=data=>createHash('sha256').update(data).digest('hex');
 await writeFile(path.join(output,'manifest.json'),JSON.stringify({
-  renderer:'@resvg/resvg-js 2.6.2',sourceSha256:sha(source),
-  landscape:{width:800,height:480,lockupWidth:width,background:'#000000'},
+  renderer:'@resvg/resvg-js 2.6.2',sourceSha256:sha(source),sourceViewBox:viewBox,
+  landscape:{width:800,height:480,lockupWidth:width,lockupHeight:height,background:'#000000'},
   boot:{width:480,height:800,rotation:'90 degrees clockwise',format:'RGB565 BMP'},
   files:{'logo.bmp':sha(bmp),'splash.png':sha(splash.asPng())}
 },null,2)+'\n');

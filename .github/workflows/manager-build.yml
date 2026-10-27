@@ -1,6 +1,11 @@
-name: Build Thing Manager preview
+name: Build Thing Manager
 on:
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      source-ref:
+        type: string
+        required: true
 permissions:
   contents: read
 jobs:
@@ -12,6 +17,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source-ref || github.sha }}
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -34,8 +42,8 @@ jobs:
           python3 -m unittest discover -s tests -p 'test_*.py'
       - name: Test Windows discovery and controller
         if: runner.os == 'Windows'
-        run: node --test manager/test/discovery.test.cjs manager/test/controller.test.cjs manager/test/build.test.cjs
-      - name: Package preview
+        run: node --test manager/test/discovery.test.cjs manager/test/controller.test.cjs manager/test/build.test.cjs manager/test/release.test.cjs manager/test/download.test.cjs manager/test/published-release.test.cjs manager/test/publisher.test.cjs
+      - name: Package Manager
         run: npm run dist --prefix manager
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
@@ -48,3 +56,4 @@ jobs:
             manager/dist/*.AppImage
             manager/dist/*.deb
           if-no-files-found: error
+          retention-days: 7

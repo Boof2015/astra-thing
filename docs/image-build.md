@@ -4,14 +4,15 @@ The Astra layer lives in `meta-astra-thing/`. It extends the pinned Superbird ki
 
 ## Artwork
 
-`branding/astra-full.svg` is the supplied vector artwork, retained with its original blue icon and white wordmark. The image renderer places it at 520 px wide, centered on a black 800×480 canvas. It exports:
+`branding/astra-full.svg` is the shared vector artwork, updated to the blue icon and rounded white wordmark used by the redesigned Thing Manager. The image renderer reads its viewBox, preserves its origin and aspect ratio, and places it at 520 px wide, centered on a black 800×480 canvas (with a 280 px height limit for unusually tall future artwork). It exports:
 
 - `branding/generated/splash.png`: the 800×480 Weston splash.
 - `branding/generated/logo.bmp`: the same canvas rotated clockwise into the panel's native 480×800 orientation, encoded as a 16-bit RGB565 BMP.
 - `prototype/web/assets/astra-full.svg`: the matching app startup lockup.
+- `manager/renderer/astra-wordmark.svg`: the matching Manager header lockup.
 - `branding/generated/manifest.json`: the input/output hashes and rendering geometry.
 
-The app boot page uses the same size, position and black background. To regenerate from the vector:
+The app boot page uses the same width and black background. Update the shared SVG in `branding/` and regenerate all copies from there:
 
 ```sh
 npm ci --prefix tools/branding

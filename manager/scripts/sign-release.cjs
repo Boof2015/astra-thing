@@ -5,10 +5,14 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const {hashFile, validate, verifyEnvelope} = require('../main/release.cjs');
 async function main() {
-  const [keyFile, flashFile, updateFile, buildFile, output] = process.argv.slice(2);
-  if (!output) throw Error('Usage: node sign-release.cjs PRIVATE_KEY FLASH_ZIP UPDATE_SWU BUILD_RECORD OUTPUT_DIRECTORY');
+  const [keyFile, flashFile, updateFile, buildFile, output, channel] = process.argv.slice(2);
+  if (!output || process.argv.length > 8) throw Error('Usage: node sign-release.cjs PRIVATE_KEY FLASH_ZIP UPDATE_SWU BUILD_RECORD OUTPUT_DIRECTORY [stable|preview]');
   const root = path.resolve(__dirname, '../..');
   const release = JSON.parse(await fs.readFile(path.join(root, 'release/version.json'), 'utf8'));
+  if (channel !== undefined) {
+    if (!['stable','preview'].includes(channel)) throw Error('Expected stable or preview channel');
+    release.channel = channel;
+  }
   const build = JSON.parse(await fs.readFile(buildFile, 'utf8'));
   if (build.version !== release.version || !/^\d{14}$/.test(build.build) || !build.upstream || !Object.keys(build.inputs || {}).length) throw Error('Build identity is incomplete');
   const manifest = {...release, schema: 1, build: build.build, artifacts: {}};

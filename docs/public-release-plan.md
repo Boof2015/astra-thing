@@ -35,7 +35,28 @@ The manager adapts Astra commit `0c32125` for browsing: explicit mDNS sockets on
 
 All 26 manager tests pass locally, including real Bonjour/DNS packet processing over a controlled datagram transport, USB hotplug/address changes with competing adapters, and socket setup failures. The Windows CI job now runs the discovery and controller regression tests; that job and physical Windows validation have not been run here. Rebuild the Windows manager from these sources before testing. The saved September 12 preview binaries and source archive predate this change.
 
+## Updated boot branding on 2026-10-26
+
+The shared logo now matches the redesigned Thing Manager: blue icon and rounded white wordmark. `npm run build:branding` regenerates the Manager header copy, app startup copy, 800×480 OS splash and correctly rotated 480×800 RGB565 boot logo. The renderer reads the SVG viewBox rather than assuming the old logo's proportions. The output headers/hashes and all rotated boot pixels were checked locally.
+
+A fresh production build was attempted, but the existing Yocto build volume contains stale shared outputs: cached tasks report files already present without matching task ownership. The build container was stopped; no new firmware package was verified or signed. Keep the September preview separate. Repair or rebuild the generated Yocto output directory while retaining downloads and shared-state cache, then audit and sign a new candidate before distributing the updated boot logo.
+
+The next acceptance sequence is Windows testing, then a nontechnical tester installing on a stock Car Thing using the packaged Manager and matching signed firmware. Record where they hesitate, need outside help, or encounter unclear errors, and revise the instructions before public release.
+
 ## Gates before public release
+
+The local-firmware/CI-installer release flow is implemented: prepare and sign a
+candidate locally, upload it to a draft, audit its images on Ubuntu, build the
+three Manager platforms, and attach the installers without publishing. A separate
+workflow checks anonymous Manager downloads after stable publication. No private
+signing key enters CI. The repository must be public for the Manager feed to work.
+
+Local validation covers 32 Manager tests, 13 UI tests and 22 Python tests. The
+image audit passed against the saved September firmware inside Ubuntu 24.04 as
+an unprivileged user, including both first-install roots, the update root and
+their boot/splash branding. Workflow syntax passed actionlint. A full GitHub run
+with a fresh branded candidate and real published downloads remains pending;
+these local checks do not claim those remote steps have passed.
 
 1. Run the whole first-install wizard on a stock device and a clean host profile. Earlier developer backup/flash work is not a substitute for this test.
 2. Finish and validate guided Windows recovery-driver setup and Linux USB permissions. Exercise networking, discovery, backup, flash and reconnect on all advertised OS versions. Intel macOS needs its own build/test.

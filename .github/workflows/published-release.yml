@@ -1,0 +1,23 @@
+name: Check published firmware downloads
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  manager-feed:
+    if: ${{ !github.event.repository.private && !github.event.release.prerelease }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Download and verify through the actual Manager feed
+        run: npm run release:check
+        env:
+          EXPECTED_RELEASE_TAG: ${{ github.event.release.tag_name }}

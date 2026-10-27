@@ -1,10 +1,17 @@
 {
   "renderer": "@resvg/resvg-js 2.6.2",
-  "sourceSha256": "dd58fb0c38a1510b97b16341d73974613a350239f2567c2ae04059df0f256686",
+  "sourceSha256": "fa6acecb4980ab5ec55c0a97e857cd98f1642c32c4d333efd227a211e0460e01",
+  "sourceViewBox": [
+    186,
+    244,
+    825,
+    142
+  ],
   "landscape": {
     "width": 800,
     "height": 480,
     "lockupWidth": 520,
+    "lockupHeight": 89.5030303030303,
     "background": "#000000"
   },
   "boot": {
@@ -14,7 +21,7 @@
     "format": "RGB565 BMP"
   },
   "files": {
-    "logo.bmp": "71864f989ce9afc1ee33d3252ffb68c8808299cb5388f7366eec56dc125135ae",
-    "splash.png": "eb5d0a519fd2b19ce93ccc94a8d78dc4f99635478dd6945204607478cb4fb443"
+    "logo.bmp": "fa5a616691c84ebb66ff5d22d40bdc77e04fd8142a7c9e86d376119401817334",
+    "splash.png": "c7f279330c91a6f35e032d20e2dea461881d30343c36c69669f6d2c451bc9a39"
   }
 }

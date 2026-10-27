@@ -38,12 +38,16 @@ npm run dev
 | `npm test` | Run manager and UI model tests |
 | `npm run test:worker` | Run native worker tests |
 | `npm run test:firmware` | Run Python client and management tests |
+| `npm run release:prepare` | Verify and sign the locally built firmware; export matching sources |
+| `npm run release:draft -- DIRECTORY` | Upload a prepared candidate as a draft and start the CI installer builds |
+| `npm run release:verify -- DIRECTORY --audit` | Audit a candidate's signatures, images and branding on Linux |
+| `npm run release:check` | Download and verify the latest public firmware through the Manager's feed |
 
 Manager installers appear in `manager/dist/`. Builds use the current machine's OS and Node architecture for both Electron and the worker; build Windows on Windows and macOS on macOS. On Windows, install Visual Studio Build Tools with **Desktop development with C++**, a Windows SDK, and Rust's MSVC toolchain. On macOS, install Xcode Command Line Tools and Rust. See [manager development](manager/README.md) for details.
 
 Firmware has separate Docker/kas/BSP prerequisites; see [firmware builds](docs/image-build.md). On Windows, run firmware builds inside WSL2/Linux, while building the Windows manager natively. Build commands do not flash hardware or publish releases. Full manager tests additionally use Python 3 and OpenSSL on PATH.
 
-Publisher helpers accept explicit paths: `npm run release:sign -- PRIVATE_KEY FLASH_ZIP UPDATE_SWU BUILD_RECORD OUTPUT_DIRECTORY` and `npm run release:sources -- OUTPUT_ARCHIVE --build-record BUILD_RECORD`. See [signed releases](release/README.md).
+Firmware builds and signing run locally; GitHub Actions audits the uploaded firmware and builds Manager installers for macOS, Windows and Linux. Everything stays in a draft until you publish it. The signing key stays on your machine. See [the release walkthrough](release/README.md) for the commit/build/upload sequence and testing drafts while the repository is private.
 
 The `.local/`, `backups/`, `work/`, dependency and build-output directories are excluded from Git, as are local environment files and signing keys. Public trust keys, lockfiles, icons, firmware branding inputs and required vendored boot resources are intentional source inputs and remain included.
 
