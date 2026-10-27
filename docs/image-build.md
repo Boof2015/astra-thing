@@ -81,13 +81,24 @@ The bootloader's [custom splash implementation](https://github.com/ThingLabsOSS/
 tries the production build on `ubuntu-24.04`. It has only `workflow_dispatch`;
 pushes, pull requests and releases do not trigger it. One experiment runs at a
 time. It starts with a fresh BSP checkout at the pinned revision, uses the pinned
-kas container and upstream public sstate mirrors, and limits compilation to two
+kas container and upstream public sstate mirrors, and limits compilation to four
 jobs. Unused SDKs are removed only from the disposable hosted runner; `rm_work`
 also reclaims completed kernel/Chromium work directories.
 
-The build step is bounded to 320 minutes, leaving time to upload diagnostics
-within GitHub's six-hour job limit. Resource samples, build/cache logs and a
-summary are retained for seven days even if the build fails. A successful run
+The build step is bounded to 335 minutes inside a 350-minute job, leaving time
+for setup and diagnostics within [GitHub's six-hour job limit](https://docs.github.com/en/actions/reference/limits).
+Every minute the console reports CPU utilization, load, available RAM, swap,
+free disk, the latest Chromium Ninja step count and the age of its last log
+output. Step counts are work items, not a percentage of elapsed build time;
+long compilations and linking can take time without producing new output.
+
+Resource samples are saved every 30 seconds in `resources.jsonl`; console
+updates are also saved in `progress.log`. Bounded compiler/cooker log tails,
+the last Chromium progress and process snapshots are saved during the build.
+A separate `always()` step collects a summary after failure or timeout, without
+depending on the interrupted build's cleanup. Diagnostics are retained for
+seven days. These are logs, not a resumable compilation cache: a retry still
+starts with a fresh build tree and the upstream sstate mirrors. A successful run
 also audits both initial slots, the update root and all boot/splash logos, then
 uploads unsigned ZIP/SWU artifacts, build records and project sources. It does
 not sign, create a release or contact a Thing. Hardware testing is still needed.

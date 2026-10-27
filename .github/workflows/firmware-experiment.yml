@@ -37,8 +37,14 @@ jobs:
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: Build and audit production firmware
         id: build
-        timeout-minutes: 320
-        run: python3 scripts/firmware-ci.py
+        timeout-minutes: 335
+        run: python3 -u scripts/firmware-ci.py
+      - name: Collect diagnostics after success, failure or timeout
+        if: always()
+        timeout-minutes: 2
+        env:
+          BUILD_OUTCOME: ${{ steps.build.outcome }}
+        run: python3 -u scripts/firmware-ci.py --collect-diagnostics --outcome "$BUILD_OUTCOME"
       - name: Upload verified unsigned firmware
         if: steps.build.outcome == 'success'
         uses: actions/upload-artifact@v4
