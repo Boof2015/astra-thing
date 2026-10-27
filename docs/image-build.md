@@ -75,6 +75,29 @@ The bootloader's [custom splash implementation](https://github.com/ThingLabsOSS/
 
 ## Production profile, version 0.3.0
 
+### Manual standard-runner experiment
+
+**Actions → Firmware on standard runner (manual experiment) → Run workflow**
+tries the production build on `ubuntu-24.04`. It has only `workflow_dispatch`;
+pushes, pull requests and releases do not trigger it. One experiment runs at a
+time. It starts with a fresh BSP checkout at the pinned revision, uses the pinned
+kas container and upstream public sstate mirrors, and limits compilation to two
+jobs. Unused SDKs are removed only from the disposable hosted runner; `rm_work`
+also reclaims completed kernel/Chromium work directories.
+
+The build step is bounded to 320 minutes, leaving time to upload diagnostics
+within GitHub's six-hour job limit. Resource samples, build/cache logs and a
+summary are retained for seven days even if the build fails. A successful run
+also audits both initial slots, the update root and all boot/splash logos, then
+uploads unsigned ZIP/SWU artifacts, build records and project sources. It does
+not sign, create a release or contact a Thing. Hardware testing is still needed.
+
+`--ci` is an optional resource profile for `scripts/build-astra-image.py --release`;
+normal local builds keep their existing settings. The build record stores the
+generated configuration hash and whether that profile was selected.
+
+### Local production build
+
 ```sh
 npm run build:firmware
 ```

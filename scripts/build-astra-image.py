@@ -12,7 +12,10 @@ from datetime import datetime, timezone
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--release', action='store_true', help='Build the public maintenance-enabled firmware profile')
+parser.add_argument('--ci', action='store_true', help='Use the standard-runner resource limits (release profile only)')
 args = parser.parse_args()
+if args.ci and not args.release:
+    parser.error('--ci requires --release')
 
 repo = Path(__file__).resolve().parent.parent
 profile = json.loads((repo / 'config/bringup-toolchain.json').read_text())
@@ -47,8 +50,12 @@ if args.release:
     version = json.loads((repo / 'release/version.json').read_text())
     build = datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')
     configuration += '\n  astra-release-identity: |\n    ASTRA_RELEASE_BUILD = "' + build + '"\n    DISTRO_VERSION = "' + version['version'] + '"\n'
+    if args.ci:
+        configuration += '\n  astra-ci-resources: |\n' + ''.join('    ' + line + '\n' for line in (repo / 'config/astra-ci.conf').read_text().splitlines())
     inputs = {str(file.relative_to(stage)): sha(file) for file in sorted(stage.rglob('*')) if file.is_file()}
     record = {'version': version['version'], 'build': build, 'upstream': commit, 'inputs': inputs}
+    record['configurationSha256'] = hashlib.sha256(configuration.encode()).hexdigest()
+    record['standardRunnerProfile'] = args.ci
     (repo / '.local/release-build.json').write_text(json.dumps(record, indent=2) + '\n')
 (upstream / 'kas/astra-image.yml').write_text(configuration)
 env = os.environ.copy()

@@ -1,0 +1,58 @@
+name: Firmware on standard runner (manual experiment)
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+concurrency:
+  group: firmware-standard-runner
+  cancel-in-progress: false
+
+jobs:
+  firmware:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Record runner and reclaim unused SDK space
+        shell: bash
+        run: |
+          test "$RUNNER_ENVIRONMENT" = github-hosted
+          mkdir -p release-output/firmware-ci/reports
+          { uname -a; lscpu; free -h; df -h; } > release-output/firmware-ci/reports/runner-before.txt
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /usr/local/.ghcup /opt/ghc /usr/share/swift /usr/local/share/powershell /opt/hostedtoolcache/CodeQL
+          docker image prune --all --force
+          sudo apt-get clean
+          df -h | tee release-output/firmware-ci/reports/disk-after-cleanup.txt
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - name: Install image inspection tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends squashfs-tools mtools
+          # BitBake uses unprivileged user namespaces inside the build container.
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+      - name: Build and audit production firmware
+        id: build
+        timeout-minutes: 320
+        run: python3 scripts/firmware-ci.py
+      - name: Upload verified unsigned firmware
+        if: steps.build.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-unsigned-${{ github.run_id }}-${{ github.run_attempt }}
+          path: release-output/firmware-ci/packages/
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
+      - name: Upload build log and resource measurements
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: release-output/firmware-ci/reports/
+          retention-days: 7
+          if-no-files-found: warn
