@@ -53,7 +53,7 @@ async function prepare(args) {
   await fs.writeFile(path.join(output,'provenance.json'),JSON.stringify({schema:1,commit:run('git',['rev-parse','HEAD'],true),version:build.version,build:build.build,channel},null,2)+'\n',{flag:'wx'});
   await verify(output,{images:false});
   await checksums(output);
-  console.log(`Prepared ${output}\nCreate a GitHub firmware release tagged firmware-v${build.version}-${build.build}.\nUpload release.json and the ZIP/SWU from this directory, plus the source archive and build records. Publish when ready.`);
+  console.log(`Prepared ${output}\nCreate a GitHub firmware release tagged firmware-v${build.version}-${build.build}.\nUpload release.json, the ZIP/SWU and project-sources.tar.gz from this directory. Keep the build records locally. Publish when ready.`);
 }
 async function main() {
   const [command,...args]=process.argv.slice(2);

@@ -23,9 +23,12 @@ Firmware and Manager share this repository but have separate releases and versio
    - `release.json`
    - the `.zip` named in that manifest (first-time installation)
    - the `.swu` named in that manifest (existing-device updates)
-5. Attach the matching source materials, build records and checksums alongside
-   the firmware. Add the compatible Astra desktop version to the release notes.
-   Publish when ready. No Manager build is triggered.
+5. Attach `project-sources.tar.gz` as the fourth download. Keep `build-inputs.json`,
+   `provenance.json`, audit reports and `SHA256SUMS` in the local candidate folder;
+   Manager does not download them, and `release.json` already contains the signed
+   firmware hashes. Put release notes in GitHub's release description, not an asset.
+   Add the compatible Astra desktop version and corresponding dependency source
+   links to those notes. Publish when ready. No Manager build is triggered.
 
 Already signed firmware does not need rebuilding or re-signing when only Manager
 changes. The signed manifest, ZIP and SWU must stay together without editing or
@@ -77,8 +80,9 @@ hardware. No workflow is triggered by publishing either kind of release.
 audit on Linux with the matching firmware sources. Manager-only source changes
 and different Manager versions do not invalidate that firmware candidate.
 
-Keep project sources, corresponding dependency sources/notices, build records and
-platform requirements with each applicable release. `project-sources.tar.gz`
+Make matching project and dependency sources/notices available with each release;
+link any separately hosted materials in its notes. Keep build records locally.
+`project-sources.tar.gz`
 contains this project's source, not the complete Linux/Chromium dependency source
 distribution. See [acceptance status](../docs/public-release-plan.md) for remaining
 hardware/platform checks and installer signing status.

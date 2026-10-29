@@ -60,3 +60,5 @@ release-output/
 *.ext4
 /*.zip
 /*.tar.gz
+docs/public-release-plan.md
+release/README.md

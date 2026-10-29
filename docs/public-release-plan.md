@@ -80,6 +80,6 @@ cover pagination, newer Manager releases, signatures and incomplete releases.
 3. Exercise physical disconnect and low-storage cases. Manager restart after a completed upload has passed; forced interruption during transfer still needs hardware coverage. Keep recovery instructions tied to observed results. Return-to-stock restoration remains unvalidated.
 4. Sign/notarize public installers as appropriate. Back up the private firmware signing key separately; never include it in source or binary packages.
 5. Assemble corresponding dependency/firmware sources, generated license/SPDX reports and binary-resource notices, matched to the tested binaries.
-6. Set the exact compatible Astra desktop release, publish matching source/build records, then publish the signed firmware assets and platform installers.
+6. Set the exact compatible Astra desktop release and provide matching source materials, then publish the signed firmware assets and platform installers. Keep internal build and audit records locally.
 
 No public release has been published. See [platform setup](manager-platforms.md), [firmware builds](image-build.md) and [release assembly](../release/README.md). This preview does not claim that clean-host or cross-platform gates have passed.
