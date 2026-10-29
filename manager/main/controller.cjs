@@ -2,6 +2,7 @@
 'use strict';
 const fs = require('node:fs/promises');
 const path = require('node:path');
+const os = require('node:os');
 const crypto = require('node:crypto');
 const {EventEmitter} = require('node:events');
 const {startDiscovery, usbEndpoints} = require('./discovery.cjs');

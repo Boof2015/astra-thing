@@ -2,6 +2,8 @@ const {test} = require('node:test');
 const assert = require('node:assert/strict');
 const {Controller, usbEndpoints, candidatesFor} = require('../main/controller.cjs');
 const crypto = require('node:crypto');
+const os = require('node:os');
+const transport = require('../main/transport.cjs');
 test('discovery merges the same USB device without hiding another Thing',()=>{
  const id=crypto.createHash('sha256').update('astra-thing:example').digest('hex').slice(0,32);
  const normal=[{id,mode:'astra',endpoint:{}}];
@@ -22,6 +24,31 @@ test('changed discovery records replace stale endpoints without granting access'
  c.discovered({...service,port:9999},'usb/Thing');assert.equal(c.endpoints.size,0);
 });
 const device={id:'a'.repeat(32),mode:'astra',endpoint:{host:'10.42.1.2',port:8843},data:{version:'0.3.0',build:'20260912000000',healthy:true}};
+test('Connect manager shows a pairing code and saves access only after approval',async t=>{
+ const c=fixture();c.current={...device,fingerprint:'b'.repeat(64)};c.detect(c.current);
+ const peer=crypto.generateKeyPairSync('ec',{namedCurve:'prime256v1'});
+ let approved=false,saved;
+ c.secureStore.save=async credentials=>{saved=structuredClone(credentials);};
+ t.mock.method(transport,'request',async(endpoint,fingerprint,method,route,{body})=>{
+  assert.deepEqual(endpoint,device.endpoint);assert.equal(fingerprint,c.current.fingerprint);assert.equal(method,'POST');
+  if(route==='/v1/pair/request') {
+   assert.equal(body.label,os.hostname().slice(0,80));
+   return {fingerprint,data:{profile:'astra-thing-management-v1',deviceId:device.id,certificate:fingerprint,
+    id:'c'.repeat(32),label:body.label,publicKey:peer.publicKey.export({type:'spki',format:'der'}).toString('base64url'),
+    nonce:crypto.randomBytes(32).toString('base64url')}};
+  }
+  assert.equal(route,'/v1/pair/finish');assert.equal(body.id,'c'.repeat(32));assert.match(body.proof,/^[A-Za-z0-9_-]{43}$/);
+  if(!approved)throw Object.assign(Error('Waiting for approval'),{status:409});
+  return {fingerprint,data:{deviceId:device.id,token:'d'.repeat(43)}};
+ });
+ await c.action('pair');
+ assert.equal(c.state.step,'pair');assert.match(c.state.code,/^\d{6}$/);assert.equal(c.actionBusy,false);
+ await c.finishPair(c.current);
+ assert.equal(c.state.step,'pair');assert.ok(c.pair);assert.deepEqual(c.credentials,{});assert.equal(saved,undefined);
+ approved=true;await c.finishPair(c.current);
+ assert.equal(c.state.step,'manage');assert.equal(c.state.code,'');assert.equal(c.pair,null);
+ assert.deepEqual(saved,{[device.id]:{deviceId:device.id,token:'d'.repeat(43),fingerprint:c.current.fingerprint}});
+});
 test('same or older releases do not offer an update',()=>{
  const c=fixture();c.current=device;
  for(const manifest of [{version:'0.3.0',build:'20260912000000'},{version:'0.2.0',build:'20260913000000'}]) {c.release={manifest};c.reviewUpdate();assert.equal(c.state.step,'upToDate');}

@@ -39,7 +39,17 @@ All 26 manager tests pass locally, including real Bonjour/DNS packet processing 
 
 The shared logo now matches the redesigned Thing Manager: blue icon and rounded white wordmark. `npm run build:branding` regenerates the Manager header copy, app startup copy, 800×480 OS splash and correctly rotated 480×800 RGB565 boot logo. The renderer reads the SVG viewBox rather than assuming the old logo's proportions. The output headers/hashes and all rotated boot pixels were checked locally.
 
-A fresh production build was attempted, but the existing Yocto build volume contains stale shared outputs: cached tasks report files already present without matching task ownership. The build container was stopped; no new firmware package was verified or signed. Keep the September preview separate. Repair or rebuild the generated Yocto output directory while retaining downloads and shared-state cache, then audit and sign a new candidate before distributing the updated boot logo.
+A fresh production build was attempted, but the existing Yocto build volume contained stale shared outputs: cached tasks reported files already present without matching task ownership. The build container was stopped; that attempt produced no verified or signed firmware. The October 29 build below supersedes this failed attempt; keep the September preview separate.
+
+## Production candidate and hardware check on 2026-10-29
+
+Production build `0.3.0+20261029190555` completed in a dedicated Ubuntu 24.04 VM using the pinned BSP and kas container, from project commit `039658b554d0d1c6286d11fb5383660b4c284861`. The build and audit took about 11 minutes: Chromium packages were restored from upstream sstate, and all 6,307 tasks succeeded. This was not a full Chromium source compilation.
+
+The Linux audit passed for both first-install roots, the update root, source hashes, production defaults and boot/OS branding. The exported ZIP/SWU and project sources were copied to the publisher Mac and their checksums verified. The candidate was signed locally with the existing trusted publisher key for the stable channel; it has not been published.
+
+Testing with `npm run dev` on macOS exposed a missing `node:os` import in the Manager's Connect manager action. The import is fixed, and a regression test now exercises starting pairing, showing a six-digit code, waiting for approval and saving access only after approval. All 16 targeted controller, management-protocol and published-release tests passed. After restarting the fixed Manager, the owner reported that the firmware flashed successfully and everything worked. This is an owner-reported hardware check, not a clean-stock installation or Windows/Linux acceptance result.
+
+Before creating the draft release, commit the Manager fix and regenerate the candidate's project-source archive and provenance from that commit so CI builds the corrected Manager. Reuse the exact tested firmware ZIP/SWU and build record: this Manager-only fix does not require a firmware rebuild. Keep the already signed candidate intact while preparing the replacement candidate directory.
 
 The next acceptance sequence is Windows testing, then a nontechnical tester installing on a stock Car Thing using the packaged Manager and matching signed firmware. Record where they hesitate, need outside help, or encounter unclear errors, and revise the instructions before public release.
 
@@ -51,12 +61,11 @@ three Manager platforms, and attach the installers without publishing. A separat
 workflow checks anonymous Manager downloads after stable publication. No private
 signing key enters CI. The repository must be public for the Manager feed to work.
 
-Local validation covers 32 Manager tests, 13 UI tests and 22 Python tests. The
-image audit passed against the saved September firmware inside Ubuntu 24.04 as
-an unprivileged user, including both first-install roots, the update root and
-their boot/splash branding. Workflow syntax passed actionlint. A full GitHub run
-with a fresh branded candidate and real published downloads remains pending;
-these local checks do not claim those remote steps have passed.
+Earlier local validation covered 32 Manager tests, 13 UI tests and 22 Python
+tests, and workflow syntax passed actionlint. The new candidate's Linux image
+audit and macOS hardware check are recorded above. A full GitHub run with this
+candidate and real published downloads remains pending; local checks do not
+claim those remote steps have passed.
 
 1. Run the whole first-install wizard on a stock device and a clean host profile. Earlier developer backup/flash work is not a substitute for this test.
 2. Finish and validate guided Windows recovery-driver setup and Linux USB permissions. Exercise networking, discovery, backup, flash and reconnect on all advertised OS versions. Intel macOS needs its own build/test.
