@@ -29,20 +29,34 @@ async function readJson(url, maximum) {
   return JSON.parse(Buffer.concat(chunks).toString('utf8'));
 }
 async function latest(trust) {
-  const info=await readJson(`https://api.github.com/repos/${REPOSITORY}/releases/latest`,1024*1024);
-  if(info.draft||info.prerelease||!Array.isArray(info.assets))throw Error('No stable firmware release is available yet');
+  // Manager releases can be newer than firmware. Scan the paginated release
+  // list and use publication time, independent of GitHub's "latest" badge.
+  let info;
+  for(let page=1; ; page++) {
+    if(page>10)throw Error('Too many releases to check. Try a signed local firmware release.');
+    const releases=await readJson(`https://api.github.com/repos/${REPOSITORY}/releases?per_page=100&page=${page}`,5*1024*1024);
+    if(!Array.isArray(releases))throw Error('Invalid firmware release listing');
+    for(const item of releases) {
+      if(!item||item.draft||item.prerelease||!/^firmware-v\d+\.\d+\.\d+-\d{14}$/.test(item.tag_name)||!Number.isFinite(Date.parse(item.published_at)))continue;
+      if(!info||Date.parse(item.published_at)>Date.parse(info.published_at))info=item;
+    }
+    if(releases.length<100)break;
+  }
+  if(!info)throw Error('No stable firmware release is available yet. You can choose a signed local release for testing.');
+  if(!Array.isArray(info.assets))throw Error('Release artifacts are incomplete');
   const asset=info.assets.find(a=>a.name==='release.json'&&a.state==='uploaded'&&a.size>0&&a.size<=150000);
   if(!asset)throw Error('This release does not include signed firmware');
   const envelope=await readJson(asset.browser_download_url,150000);
   const manifest=verifyEnvelope(envelope,trust);
   if(manifest.channel!=='stable')throw Error('The latest release is not stable firmware');
+  if(info.tag_name!==`firmware-v${manifest.version}-${manifest.build}`)throw Error('Firmware release tag does not match its signed version and build');
   const urls={};
   for(const [kind,artifact] of Object.entries(manifest.artifacts)) {
     const file=info.assets.find(a=>a.name===artifact.file&&a.state==='uploaded'&&a.size===artifact.bytes);
     if(!file)throw Error('Release artifacts are incomplete');
     allowed(file.browser_download_url);urls[kind]=file.browser_download_url;
   }
-  return {envelope,manifest,urls};
+  return {envelope,manifest,urls,tag:info.tag_name};
 }
 async function download(url, filename, artifact, onProgress) {
   // The ~400 MB first-install archive needs longer than a metadata request on slower connections.

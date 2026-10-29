@@ -10,15 +10,16 @@ const {Controller} = require('../main/controller.cjs');
 const transport = require('../main/transport.cjs');
 const {privateKey, publicKey} = crypto.generateKeyPairSync('rsa', {modulusLength:3072});
 const trust = {keys:[{id:'test',publicKey:publicKey.export({format:'pem',type:'spki'})}]};
-const api = 'https://api.github.com/repos/Boof2015/astra-thing/releases/latest';
-const base = 'https://github.com/Boof2015/astra-thing/releases/download/v0.3.0-20261027000000/';
+const api = 'https://api.github.com/repos/Boof2015/astra-thing/releases?per_page=100&page=';
+const base = 'https://github.com/Boof2015/astra-thing/releases/download/firmware-v0.3.0-20261027000000/';
 
 function fixture() {
   const files = {'firmware.zip':Buffer.from('test first-install image'),'firmware.swu':Buffer.from('test update image')};
   const artifacts = Object.fromEntries(Object.entries(files).map(([file, bytes]) => [file.endsWith('.zip')?'flash':'update',
     {file,bytes:bytes.length,sha256:crypto.createHash('sha256').update(bytes).digest('hex')}]));
   const manifest = {schema:1,modelId:'astra-thing',version:'0.3.0',minimumManager:'0.3.0',build:'20261027000000',channel:'stable',artifacts};
-  const info = {draft:false,prerelease:false,assets:[]};
+  const info = {tag_name:'firmware-v0.3.0-20261027000000',published_at:'2026-10-27T12:00:00Z',draft:false,prerelease:false,assets:[]};
+  const pages = [[info]];
   function sign() {
     const payload = Buffer.from(JSON.stringify(manifest));
     files['release.json'] = Buffer.from(JSON.stringify({schema:1,keyId:'test',payload:payload.toString('base64url'),signature:crypto.sign('sha256',payload,privateKey).toString('base64url')}));
@@ -28,13 +29,35 @@ function fixture() {
   const calls = [];
   async function fetch(url, options) {
     calls.push({url,options});
-    if(url===api) {assert.equal(options.headers.Accept,'application/json');return Response.json(info);}
+    if(url.startsWith(api)) {assert.equal(options.headers.Accept,'application/json');return Response.json(pages[Number(url.slice(api.length))-1]||[]);}
     assert.ok(url.startsWith(base), 'Unexpected request: '+url);
     const file = files[url.slice(base.length)];
     return new Response(file||'',{status:file?200:404});
   }
-  return {files,manifest,info,sign,fetch,calls};
+  return {files,manifest,info,pages,sign,fetch,calls};
 }
+
+test('firmware discovery ignores Manager releases and follows pagination by publication date',async t=>{
+  const f=fixture();
+  const newerManager={tag_name:'manager-v9.0.0',published_at:'2026-10-29T12:00:00Z',draft:false,prerelease:false,assets:[]};
+  f.pages[0]=Array.from({length:100},()=>({...newerManager}));
+  f.pages[0][0]={...f.info,tag_name:'firmware-v0.2.0-20260901000000',published_at:'2026-09-01T12:00:00Z'};
+  f.pages[1]=[{...f.info,tag_name:'firmware-v9.0.0-20261029000000',draft:true},
+    {...f.info,tag_name:'firmware-v8.0.0-20261028000000',prerelease:true},f.info];
+  t.mock.method(global,'fetch',f.fetch);
+  const selected=await latest(trust);
+  assert.equal(selected.tag,f.info.tag_name);
+  assert.equal(selected.manifest.version,'0.3.0');
+  assert.deepEqual(f.calls.map(c=>c.url),[api+'1',api+'2',base+'release.json']);
+});
+
+test('an invalid newest firmware release is reported instead of silently using an older release',async t=>{
+  const f=fixture();
+  f.pages[0].push({...f.info,tag_name:'firmware-v0.4.0-20261028000000',published_at:'2026-10-28T12:00:00Z',assets:[]});
+  t.mock.method(global,'fetch',f.fetch);
+  await assert.rejects(latest(trust),/does not include signed firmware/);
+  assert.equal(f.calls.length,1);
+});
 
 test('published release downloads both verified artifacts and hands the update to the authorized Thing',async()=>{
   const f=fixture(), originalFetch=global.fetch, originalRequest=transport.request;
@@ -73,6 +96,8 @@ test('drafts, prereleases, unsigned changes and incomplete uploads cannot become
   try {
     for(const mutate of [
       f=>{f.info.draft=true;}, f=>{f.info.prerelease=true;},
+      f=>{f.info.tag_name='manager-v0.3.0';}, f=>{f.info.published_at=null;},
+      f=>{f.info.tag_name='firmware-v0.4.0-20261027000000';},
       f=>{f.manifest.channel='preview';f.sign();},
       f=>{f.info.assets=f.info.assets.filter(a=>a.name!=='firmware.swu');},
       f=>{f.info.assets.find(a=>a.name==='firmware.zip').size++;},
@@ -110,6 +135,8 @@ test('release checks handle missing public releases, throttling and unsafe redir
     global.fetch=async()=>{calls++;return new Response('',{status:302,headers:{Location:'https://example.com/file'}});};
     await assert.rejects(latest(trust),/Unexpected firmware download/);assert.equal(calls,1);
     global.fetch=async()=>new Response('',{status:302});await assert.rejects(latest(trust),/missing its address/);
-    global.fetch=async()=>new Response('x'.repeat(1024*1024+1));await assert.rejects(latest(trust),/Oversized/);
+    global.fetch=async()=>Response.json({});await assert.rejects(latest(trust),/Invalid firmware release listing/);
+    global.fetch=async()=>Response.json([]);await assert.rejects(latest(trust),/No stable firmware/);
+    global.fetch=async()=>new Response('x'.repeat(5*1024*1024+1));await assert.rejects(latest(trust),/Oversized/);
   } finally {global.fetch=original;}
 });

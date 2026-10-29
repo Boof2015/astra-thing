@@ -1,117 +1,84 @@
-# Release inputs
+# Firmware and Manager releases
 
-`version.json` identifies the Thing firmware and manager release. Astra desktop is
-released independently; this work does not build or replace it.
+Firmware and Manager share this repository but have separate releases and versions.
 
-`trusted-keys.json` contains public publisher keys only. The manager and firmware
-verify the same signed release envelope before accepting a package. Signatures
-cover the exact manifest bytes, including model, version, build, artifact sizes,
-and SHA-256 hashes. The firmware additionally checks the exact permitted A/B
-update actions and both payload hashes before invoking SWUpdate.
+| Release | Tag | How it is prepared |
+| --- | --- | --- |
+| Firmware | `firmware-vVERSION-BUILD` | Build and sign locally; upload files manually |
+| Manager | `manager-vVERSION` | Manually run CI; installers are attached to a draft |
 
-Private signing keys belong outside Git, backed up by the publisher. A missing
-trusted publisher key makes installation unavailable; it never falls back to an
-unsigned package. Production artifacts must not contain a private signing key or
-device credentials.
+## Firmware: build, sign, upload
 
-## Local firmware, CI installers, manual publication
+1. Set the firmware version in `release/version.json`. Its `minimumManager` field
+   identifies the oldest compatible Manager; the two versions do not need to match.
+2. Build and test the image using the [firmware instructions](../docs/image-build.md).
+   Audit the ZIP/SWU on Linux, including the roots and boot artwork, and test on
+   hardware before publishing. A successful build provides `.local/release-build.json`.
+3. Run `npm run release:prepare`. This checks the firmware, signs it with the local
+   publisher key and exports its sources and build records to `release-output/`.
+   For files copied from another builder, pass `--flash`, `--update` and
+   `--build-record`. Use `--output` for a new destination if a candidate already exists.
+4. Create a GitHub release with the tag printed by that command, for example
+   `firmware-v0.3.0-20261029190555`. Upload these three files from the output directory:
+   - `release.json`
+   - the `.zip` named in that manifest (first-time installation)
+   - the `.swu` named in that manifest (existing-device updates)
+5. Attach the matching source materials, build records and checksums alongside
+   the firmware. Add the compatible Astra desktop version to the release notes.
+   Publish when ready. No Manager build is triggered.
 
-The firmware build stays on a Mac or Linux machine with the pinned Yocto setup.
-GitHub's standard runners handle image verification and Manager packaging. No
-firmware signing secret or self-hosted runner is required on GitHub.
+Already signed firmware does not need rebuilding or re-signing when only Manager
+changes. The signed manifest, ZIP and SWU must stay together without editing or
+renaming their contents. `provenance.json` records the source revision used when
+preparing the archive; it does not control Manager CI.
 
-1. Update `release/version.json`, `package.json`, `manager/package.json` and their
-   lockfile versions together when changing the version. Regenerate branding if
-   its SVG changed. Commit and push the release sources, including these workflows
-   on the default branch. Preparation refuses an uncommitted checkout.
-2. Build firmware with `npm run build:firmware`. A successful build supplies the
-   ZIP, SWU and `.local/release-build.json`. A failed build must be fixed first;
-   old deploy symlinks do not count as a successful new candidate.
-3. Run `npm run release:prepare`. It verifies package structure, build identity
-   and every staged firmware source; signs the candidate using the existing local
-   `.local/signing/astra-thing-release-private.pem`; and exports project sources.
-   It prints a new directory under `release-output/`.
-4. Run `npm run release:draft -- "DIRECTORY_FROM_PREPARE"`. This requires `gh`
-   authenticated with repository/workflow access. It checks that the commit is
-   pushed, uploads a draft tagged `vVERSION-BUILD`, then dispatches **Complete
-   draft release**. It never publishes. Retrying resumes missing uploads and
-   refuses different bytes under the same candidate name.
-5. Wait for **Complete draft release** to pass. It checks the signature, both
-   first-install roots, the OTA root, production defaults, source hashes and each
-   boot/OS logo. It rebuilds the Manager on macOS (Apple silicon), Windows x64 and
-   Linux x64, then attaches installers, `firmware-audit.json` and final
-   `SHA256SUMS` to that same draft. A failure leaves the draft unpublished; rerun
-   the failed jobs from Actions after resolving the failure. Published releases
-   cannot be overwritten by this workflow.
-6. Test the exact draft packages, complete the remaining public release gates
-   below, and edit the release notes with the compatible Astra desktop version.
-   Make the repository public when ready, then publish the draft as the latest
-   stable release. **Check published firmware downloads** runs the actual
-   Manager download path anonymously and verifies the ZIP and SWU again.
+Preparation defaults to the stable channel. For preview-only firmware, use
+`--channel preview` and mark its GitHub release as a prerelease. Manager ignores
+previews and drafts during automatic checks. To test either locally, keep
+`release.json`, ZIP and SWU together and choose that `release.json` in Manager.
 
-Preparation defaults to a **stable-channel candidate**, still held in a draft.
-That is intentional: publishing a draft does not change its signed manifest.
-Use `npm run release:prepare -- --channel preview` for a candidate that must stay
-outside the public stable feed; it creates a prerelease draft. To change channel
-after signing, prepare a new candidate rather than editing `release.json`.
+The private key stays in `.local/signing/astra-thing-release-private.pem` or the
+path supplied with `--key`. Keep a separate private backup. Only the signed
+manifest and public trust keys are distributed. `release:prepare` never uploads,
+publishes or flashes anything.
 
-`release:prepare` also accepts `--key`, `--flash`, `--update`, `--build-record`
-and `--output` paths. It refuses an existing output directory. Each candidate's
-`provenance.json` fixes the source commit CI checks out. `project-sources.tar.gz`
-must exactly match the source archive recreated in CI. The private key is never
-uploaded; only its signed envelope and the public trust keys are distributed.
+## Manager: CI to a draft
 
-While the repository is private, or while a release is a draft, download its
-`release.json`, ZIP and SWU together using your GitHub account, then choose the
-local `release.json` in Manager. The Manager does not carry a GitHub token and
-will not see private releases, drafts or prereleases in its public feed. Once a
-stable release is published publicly, **Check for updates** offers it and the
-normal installation/update action downloads the appropriate signed package.
+1. Update `manager/package.json` and its lockfile when changing the Manager version.
+   Commit and push the Manager changes. Firmware versions and files stay independent.
+2. Open **Actions → Build Manager draft release → Run workflow** on the desired branch.
+3. CI tests and builds the macOS DMG, Windows installer and Linux AppImage/deb,
+   then attaches them and `SHA256SUMS` to a `manager-vVERSION` draft.
+4. Download and test the installers, edit the notes and publish when ready.
 
-`npm run release:check` repeats the anonymous feed/download check locally. It
-downloads both artifacts to temporary storage, verifies their signed sizes and
-hashes, then removes them. It never connects to a Thing. CI's firmware audit
-checks image contents; actual booting, flashing and USB behavior still need
-hardware validation.
+This workflow runs only when manually dispatched. It does not need a firmware
+release, signing key, firmware audit or matching firmware version. Rerunning it
+refreshes the same unpublished Manager draft. It refuses to replace a published
+release; bump the Manager version for the next release.
 
-## Low-level local assembly
+## How Manager finds firmware
 
-Build and audit the production image first; see [image builds](../docs/image-build.md).
-Use a new output directory for each candidate. Do not replace the tested files with
-later build convenience symlinks.
+Manager lists GitHub releases, ignores Manager releases, drafts and prereleases,
+then selects the most recently **published** stable `firmware-vVERSION-BUILD`
+release. This works across release-list pages and does not depend on GitHub's
+"latest" badge. The tag must match the version and build in the signed manifest.
 
-```sh
-node manager/scripts/sign-release.cjs PRIVATE_KEY FLASH_ZIP UPDATE_SWU BUILD_RECORD OUTPUT_DIRECTORY
-python3 scripts/package-sources.py PROJECT_SOURCE_TAR_GZ --build-record BUILD_RECORD
-npm run dist --prefix manager
-```
+It verifies the publisher signature, minimum Manager version, expected sizes and
+checksums before installation. An invalid or incomplete newest firmware release
+is reported as an error rather than silently selecting an older image.
 
-The signing command copies the ZIP/SWU and writes `release.json` plus
-`build-inputs.json`. It refuses an existing destination and verifies that the
-signing key matches a trusted public key. It never publishes anything. The source
-export checks every firmware input against its build record and excludes private
-local data and compiled caches. This archive is the project's source, not the
-complete Linux/Chromium dependency source distribution.
+After publishing firmware, `npm run release:check` can manually exercise the same
+anonymous discovery/download path. It checks both packages and contacts no
+hardware. No workflow is triggered by publishing either kind of release.
 
-The publisher must keep an offline copy of the private signing key before
-distributing firmware that trusts it. Keep that key out of release folders,
-diagnostics, CI artifacts and source archives. OS installer signing uses separate
-platform credentials.
+## Validation and source materials
 
-## Public release contents
+`npm run release:verify -- DIRECTORY --audit` repeats the signature and full image
+audit on Linux with the matching firmware sources. Manager-only source changes
+and different Manager versions do not invalidate that firmware candidate.
 
-- Signed `release.json` and the exact ZIP/SWU named inside it. Mark only a tested
-  stable release as the latest stable GitHub release; the manager's feed reads it.
-- Platform installers built from the matching manager sources and lockfiles.
-- Project sources, pinned Cargo dependency sources/build instructions, the
-  corresponding Yocto/Chromium/system source materials, license manifests/SPDX
-  reports and notices for bundled binary resources.
-- Checksums for the whole bundle, build-input records, platform requirements,
-  installation/recovery instructions and the exact required Astra desktop version.
-
-The reusable `.github/workflows/manager-build.yml` can also be run manually for
-standalone tester installers. `draft-release.yml` uses it after the firmware
-audit passes; neither workflow publishes. macOS installers currently use ad-hoc
-signing and Windows installers are unsigned. Windows driver setup, Linux USB
-permissions, clean-stock installation, complete corresponding dependency sources
-and platform signing remain release gates; see [acceptance status](../docs/public-release-plan.md).
+Keep project sources, corresponding dependency sources/notices, build records and
+platform requirements with each applicable release. `project-sources.tar.gz`
+contains this project's source, not the complete Linux/Chromium dependency source
+distribution. See [acceptance status](../docs/public-release-plan.md) for remaining
+hardware/platform checks and installer signing status.

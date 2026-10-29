@@ -49,23 +49,31 @@ The Linux audit passed for both first-install roots, the update root, source has
 
 Testing with `npm run dev` on macOS exposed a missing `node:os` import in the Manager's Connect manager action. The import is fixed, and a regression test now exercises starting pairing, showing a six-digit code, waiting for approval and saving access only after approval. All 16 targeted controller, management-protocol and published-release tests passed. After restarting the fixed Manager, the owner reported that the firmware flashed successfully and everything worked. This is an owner-reported hardware check, not a clean-stock installation or Windows/Linux acceptance result.
 
-Before creating the draft release, commit the Manager fix and regenerate the candidate's project-source archive and provenance from that commit so CI builds the corrected Manager. Reuse the exact tested firmware ZIP/SWU and build record: this Manager-only fix does not require a firmware rebuild. Keep the already signed candidate intact while preparing the replacement candidate directory.
+The Manager fix was committed as `fcac2c2`. The tested firmware remains valid without rebuilding. Manager CI now builds from the selected workflow revision independently of the firmware source archive.
 
 The next acceptance sequence is Windows testing, then a nontechnical tester installing on a stock Car Thing using the packaged Manager and matching signed firmware. Record where they hesitate, need outside help, or encounter unclear errors, and revise the instructions before public release.
 
 ## Gates before public release
 
-The local-firmware/CI-installer release flow is implemented: prepare and sign a
-candidate locally, upload it to a draft, audit its images on Ubuntu, build the
-three Manager platforms, and attach the installers without publishing. A separate
-workflow checks anonymous Manager downloads after stable publication. No private
-signing key enters CI. The repository must be public for the Manager feed to work.
+The release paths are independent: firmware is built, audited and signed locally,
+then manually uploaded under a `firmware-vVERSION-BUILD` tag. The manually
+triggered Manager workflow builds all three platforms and attaches installers to
+a separate `manager-vVERSION` draft. Only the owner publishes releases. Manager
+checks published stable firmware tags; neither a newer Manager release nor
+GitHub's latest badge changes the firmware it selects. No firmware key enters CI.
 
 Earlier local validation covered 32 Manager tests, 13 UI tests and 22 Python
 tests, and workflow syntax passed actionlint. The new candidate's Linux image
-audit and macOS hardware check are recorded above. A full GitHub run with this
-candidate and real published downloads remains pending; local checks do not
-claim those remote steps have passed.
+audit and macOS hardware check are recorded above. The first combined-release CI
+attempt stopped at its draft lookup before any
+builds. That combined workflow has been removed. The independent Manager draft
+workflow and real published firmware downloads still need a full GitHub run;
+local checks do not claim those remote steps have passed.
+
+The release simplification passed 23 targeted Manager tests, workflow syntax
+validation and four local draft-step simulations: new draft, existing draft,
+published-release refusal and missing-installer refusal. Firmware lookup tests
+cover pagination, newer Manager releases, signatures and incomplete releases.
 
 1. Run the whole first-install wizard on a stock device and a clean host profile. Earlier developer backup/flash work is not a substitute for this test.
 2. Finish and validate guided Windows recovery-driver setup and Linux USB permissions. Exercise networking, discovery, backup, flash and reconnect on all advertised OS versions. Intel macOS needs its own build/test.

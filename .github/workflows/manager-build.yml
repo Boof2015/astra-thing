@@ -1,13 +1,11 @@
-name: Build Thing Manager
+name: Build Manager draft release
 on:
   workflow_dispatch:
-  workflow_call:
-    inputs:
-      source-ref:
-        type: string
-        required: true
 permissions:
   contents: read
+concurrency:
+  group: manager-draft-release
+  cancel-in-progress: false
 jobs:
   package:
     strategy:
@@ -18,7 +16,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.source-ref || github.sha }}
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -35,11 +32,9 @@ jobs:
         run: rustup toolchain install stable --profile minimal
       - name: Test native worker
         run: cargo test --locked --manifest-path manager/native/Cargo.toml
-      - name: Test management and client
+      - name: Test Manager
         if: runner.os != 'Windows'
-        run: |
-          npm test --prefix manager
-          python3 -m unittest discover -s tests -p 'test_*.py'
+        run: npm test --prefix manager
       - name: Test Windows discovery and controller
         if: runner.os == 'Windows'
         run: node --test manager/test/discovery.test.cjs manager/test/controller.test.cjs manager/test/build.test.cjs manager/test/release.test.cjs manager/test/download.test.cjs manager/test/published-release.test.cjs manager/test/publisher.test.cjs
@@ -57,3 +52,59 @@ jobs:
             manager/dist/*.deb
           if-no-files-found: error
           retention-days: 7
+
+  draft:
+    needs: package
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: thing-manager-*
+          merge-multiple: true
+          path: release-output/manager
+      - name: Create or update the unpublished Manager draft
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          version=$(node -p "require('./manager/package.json').version")
+          tag="manager-v$version"
+          cd release-output/manager
+          shopt -s nullglob
+          for extension in dmg exe AppImage deb; do
+            files=( *."$extension" )
+            if (( ${#files[@]} == 0 )); then
+              echo "Missing Manager installer: $extension" >&2
+              exit 1
+            fi
+          done
+          sha256sum -- *.dmg *.exe *.AppImage *.deb > SHA256SUMS
+          cat > "$RUNNER_TEMP/manager-notes.md" <<EOF
+          Astra Thing Manager $version for macOS, Windows and Linux.
+
+          Download the installer for your computer. Firmware is released separately under firmware-* tags; Manager checks those releases when installing or updating a Thing.
+
+          This is an unpublished draft. Test the installers before publishing.
+          Source: $GITHUB_SHA
+          EOF
+          if gh release view "$tag" --json isDraft > /dev/null 2>&1; then
+            gh release view "$tag" --json isDraft --jq '.isDraft' | grep -qx true
+            gh release edit "$tag" --target "$GITHUB_SHA" --notes-file "$RUNNER_TEMP/manager-notes.md"
+          else
+            gh release create "$tag" --draft --target "$GITHUB_SHA" \
+              --title "Astra Thing Manager $version" --notes-file "$RUNNER_TEMP/manager-notes.md"
+          fi
+          # A rerun may refresh this draft, but must never replace a published release.
+          gh release view "$tag" --json isDraft,targetCommitish \
+            --jq '.isDraft and .targetCommitish == env.GITHUB_SHA' | grep -qx true
+          gh release upload "$tag" --clobber -- *.dmg *.exe *.AppImage *.deb SHA256SUMS
+          gh release view "$tag" --json url --jq '.url' >> "$GITHUB_STEP_SUMMARY"

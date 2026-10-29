@@ -3,12 +3,10 @@
 'use strict';
 const fs = require('node:fs/promises');
 const path = require('node:path');
-const os = require('node:os');
 const {spawnSync} = require('node:child_process');
 const {parseArgs} = require('node:util');
 const {readEnvelope, verifyArtifact, hashFile} = require('../manager/main/release.cjs');
 const root = path.resolve(__dirname, '..');
-const repository = 'Boof2015/astra-thing';
 const json = async file => JSON.parse(await fs.readFile(file, 'utf8'));
 function run(command, args, capture = false) {
   const result = spawnSync(command, args, {cwd:root, encoding:'utf8', stdio:capture?['ignore','pipe','pipe']:'inherit'});
@@ -27,20 +25,18 @@ async function verify(directory, {audit=false, images=true}={}) {
   const selected=await readEnvelope(path.join(directory,'release.json'),trust);
   const build=await json(path.join(directory,'build-inputs.json'));
   const provenance=await json(path.join(directory,'provenance.json'));
-  const version=await json(path.join(root,'release/version.json'));
   const manifest=selected.manifest;
-  if(build.version!==manifest.version||build.build!==manifest.build||version.version!==manifest.version||provenance.build!==build.build||provenance.version!==build.version||provenance.channel!==manifest.channel)throw Error('Release identities disagree');
-  if(!/^[a-f0-9]{40}$/.test(provenance.commit)||run('git',['rev-parse','HEAD'],true)!==provenance.commit)throw Error('Check out the exact commit recorded in provenance.json before using this candidate');
-  for(const file of ['package.json','manager/package.json'])if((await json(path.join(root,file))).version!==manifest.version)throw Error(`${file} version does not match firmware`);
+  if(build.version!==manifest.version||build.build!==manifest.build||provenance.build!==build.build||provenance.version!==build.version||provenance.channel!==manifest.channel)throw Error('Release identities disagree');
+  if(!/^[a-f0-9]{40}$/.test(provenance.commit))throw Error('Invalid firmware source commit');
   if(JSON.stringify(trust)!==JSON.stringify(await json(path.join(root,'prototype/trusted-keys.json'))))throw Error('Manager and firmware publisher keys differ');
   for(const artifact of Object.values(manifest.artifacts))await verifyArtifact(path.join(directory,artifact.file),artifact);
   const files=Object.fromEntries(Object.entries(manifest.artifacts).map(([kind,a])=>[kind,path.join(directory,a.file)]));
   if(images)python(['scripts/verify-release-images.py',files.flash,files.update,path.join(directory,'build-inputs.json'),...(audit?['--audit']:[]),'--report',path.join(directory,audit?'firmware-audit.json':'firmware-verification.json')]);
-  return {manifest,provenance,tag:`v${manifest.version}-${manifest.build}`};
+  return {manifest,provenance,tag:`firmware-v${manifest.version}-${manifest.build}`};
 }
 async function prepare(args) {
   const {values}=parseArgs({args,options:Object.fromEntries(['key','flash','update','build-record','output','channel'].map(name=>[name,{type:'string'}]))});
-  if(run('git',['status','--porcelain'],true))throw Error('Commit your release changes first so CI can build exactly the same sources');
+  if(run('git',['status','--porcelain'],true))throw Error('Commit your changes first so the firmware source archive has a recorded revision');
   const record=path.resolve(values['build-record']||path.join(root,'.local/release-build.json'));
   const build=await json(record), channel=values.channel||'stable';
   if(!['stable','preview'].includes(channel)||!/^\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?$/.test(build.version)||!/^\d{14}$/.test(build.build))throw Error('Invalid release identity or channel');
@@ -57,56 +53,14 @@ async function prepare(args) {
   await fs.writeFile(path.join(output,'provenance.json'),JSON.stringify({schema:1,commit:run('git',['rev-parse','HEAD'],true),version:build.version,build:build.build,channel},null,2)+'\n',{flag:'wx'});
   await verify(output,{images:false});
   await checksums(output);
-  console.log(`Prepared ${output}\nNext: npm run release:draft -- "${output}"`);
-}
-async function draft(directory) {
-  if(run('git',['status','--porcelain'],true))throw Error('Commit your release changes before uploading a candidate');
-  const {manifest,provenance,tag}=await verify(directory);
-  await fs.access(path.join(directory,'project-sources.tar.gz'));
-  await checksums(directory);
-  // Confirm the exact commit is available remotely before creating anything.
-  const remote=JSON.parse(run('gh',['api',`repos/${repository}/commits/${provenance.commit}`],true));
-  if(remote.sha!==provenance.commit)throw Error('Push the release commit before creating its draft');
-  const workflow=JSON.parse(run('gh',['api',`repos/${repository}/actions/workflows/draft-release.yml`],true));
-  if(workflow.state!=='active')throw Error('Push and enable the draft-release workflow first');
-  const notes=path.join(directory,'DRAFT-NOTES.md');
-  await fs.writeFile(notes,`Astra Thing ${manifest.version} · build ${manifest.build}\n\nThis candidate is a draft. Wait for the **Complete draft release** workflow to pass and attach the Manager installers before publishing.\n\nSource commit: ${provenance.commit}\nChannel: ${manifest.channel}\n\nBefore publication: test the exact firmware on hardware, finish Windows/Linux and stock-device onboarding checks, attach complete corresponding dependency sources/notices, and state the required Astra desktop release. macOS installers are ad-hoc signed; Windows installers are unsigned.\n\nThe Manager discovers only published stable releases in a public repository. It ignores drafts and prereleases.\n`);
-  const listed=JSON.parse(run('gh',['release','list','--repo',repository,'--limit','1000','--json','tagName'],true));
-  let existing;
-  if(listed.some(r=>r.tagName===tag)){
-    existing=JSON.parse(run('gh',['release','view',tag,'--repo',repository,'--json','isDraft,targetCommitish,isPrerelease,assets'],true));
-    if(!existing.isDraft||existing.targetCommitish!==provenance.commit||existing.isPrerelease!==(manifest.channel==='preview'))throw Error('This tag already belongs to a different candidate or a published release');
-  }else{
-    run('gh',['release','create',tag,'--repo',repository,'--target',provenance.commit,'--draft','--title',`Astra Thing ${manifest.version} · ${manifest.build}`,'--notes-file',notes,...(manifest.channel==='preview'?['--prerelease']:[])]);
-  }
-  // Resume an interrupted upload without replacing any firmware. CI owns final checksums.
-  const assets=['release.json','build-inputs.json','provenance.json','project-sources.tar.gz','firmware-verification.json','DRAFT-NOTES.md',...Object.values(manifest.artifacts).map(a=>a.file)];
-  const temporary=await fs.mkdtemp(path.join(os.tmpdir(),'astra-draft-'));
-  try{
-    for(const name of assets){
-      const remoteAsset=existing?.assets.find(a=>a.name===name);
-      if(remoteAsset){
-        const copy=path.join(temporary,name);
-        run('gh',['release','download',tag,'--repo',repository,'--pattern',name,'--output',copy]);
-        if(await hashFile(copy)!==await hashFile(path.join(directory,name)))throw Error('The draft already contains different bytes: '+name);
-      }else{
-        const current=JSON.parse(run('gh',['release','view',tag,'--repo',repository,'--json','isDraft'],true));
-        if(!current.isDraft)throw Error('The release was published during upload; stopping');
-        run('gh',['release','upload',tag,path.join(directory,name),'--repo',repository]);
-      }
-    }
-  }finally{await fs.rm(temporary,{recursive:true,force:true});}
-  // The workflow generates SHA256SUMS only after all firmware and installers are present.
-  run('gh',['workflow','run','draft-release.yml','--repo',repository,'-f',`tag=${tag}`]);
-  console.log(`Draft created: https://github.com/${repository}/releases/tag/${tag}\nCI will audit the firmware and attach Manager installers. Publish manually after testing.`);
+  console.log(`Prepared ${output}\nCreate a GitHub firmware release tagged firmware-v${build.version}-${build.build}.\nUpload release.json and the ZIP/SWU from this directory, plus the source archive and build records. Publish when ready.`);
 }
 async function main() {
   const [command,...args]=process.argv.slice(2);
   if(command==='prepare')return prepare(args);
-  if(command==='draft'&&args.length===1)return draft(path.resolve(args[0]));
   if(command==='verify'&&args[0]&&args.slice(1).every(a=>a==='--audit'))return verify(path.resolve(args[0]),{audit:args.includes('--audit')});
   if(command==='checksums'&&args.length===1)return checksums(path.resolve(args[0]));
-  throw Error('Use release:prepare [--key PATH --channel stable|preview], release:draft DIRECTORY, or release:verify DIRECTORY [--audit]');
+  throw Error('Use release:prepare [--key PATH --channel stable|preview], release:verify DIRECTORY [--audit]');
 }
 if(require.main===module)main().catch(error=>{console.error(error.message);process.exitCode=1;});
 module.exports={verify,checksums};

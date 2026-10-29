@@ -39,7 +39,6 @@ npm run dev
 | `npm run test:worker` | Run native worker tests |
 | `npm run test:firmware` | Run Python client and management tests |
 | `npm run release:prepare` | Verify and sign the locally built firmware; export matching sources |
-| `npm run release:draft -- DIRECTORY` | Upload a prepared candidate as a draft and start the CI installer builds |
 | `npm run release:verify -- DIRECTORY --audit` | Audit a candidate's signatures, images and branding on Linux |
 | `npm run release:check` | Download and verify the latest public firmware through the Manager's feed |
 
@@ -47,7 +46,7 @@ Manager installers appear in `manager/dist/`. Builds use the current machine's O
 
 Firmware has separate Docker/kas/BSP prerequisites; see [firmware builds](docs/image-build.md). On Windows, run firmware builds inside WSL2/Linux, while building the Windows manager natively. Build commands do not flash hardware or publish releases. Full manager tests additionally use Python 3 and OpenSSL on PATH.
 
-Firmware builds and signing run locally; GitHub Actions audits the uploaded firmware and builds Manager installers for macOS, Windows and Linux. Everything stays in a draft until you publish it. The signing key stays on your machine. See [the release walkthrough](release/README.md) for the commit/build/upload sequence and testing drafts while the repository is private.
+Firmware and Manager are released independently. Build, test and sign firmware locally, then manually upload its files to a `firmware-vVERSION-BUILD` release. Run **Actions → Build Manager draft release** to build installers for macOS, Windows and Linux into a separate `manager-vVERSION` draft. You publish each when ready. Manager checks only published stable firmware releases for device updates. See [the release walkthrough](release/README.md).
 
 The `.local/`, `backups/`, `work/`, dependency and build-output directories are excluded from Git, as are local environment files and signing keys. Public trust keys, lockfiles, icons, firmware branding inputs and required vendored boot resources are intentional source inputs and remain included.
 
